@@ -11,7 +11,6 @@
 #include "SDL3/SDL_init.h"
 
 #include "dss/runtime.h"
-#include "utils.h"
 
 #include <string>
 
@@ -27,16 +26,7 @@ public:
 	 *
 	 * @param title Title of the window
 	 */
-	window_helper_t(std::string title)
-	{
-		sdl_window = SDL_CreateWindow(title.c_str(), 700, 300, 0);
-
-		const auto *fmt = SDL_GetPixelFormatDetails(get_surface()->format);
-
-		SDL_FillSurfaceRect(get_surface(), nullptr, SDL_MapRGB(fmt, nullptr, 50, 50, 50));
-
-		SDL_UpdateWindowSurface(sdl_window);
-	}
+	window_helper_t(std::string title) { sdl_window = SDL_CreateWindow(title.c_str(), 700, 300, 0); }
 
 	/**
 	 * @brief Get the surface object
@@ -56,6 +46,8 @@ public:
 			SDL_DestroyWindow(sdl_window);
 		}
 	}
+
+	auto get_sdl_window() -> SDL_Window * { return sdl_window; }
 
 private:
 	SDL_Window *sdl_window = nullptr;
@@ -89,7 +81,7 @@ private:
 	 * @brief The application's status. This should not be directly set. Instead, use `app_t::kill()`
 	 *
 	 */
-	bool m_running{true};
+	bool m_running = true;
 };
 
 #endif
