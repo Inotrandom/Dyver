@@ -1,7 +1,7 @@
 ![alt text](https://github.com/deep-sea-tactics/Dyver/blob/main/dyver_light.png "Dyver Logo")
 
 # Dyver
-Dyver is an application designed to aid in the operation of an ROV, and contains necessary drivers and mathematics. It additionally will have features for MATE ROV tasks.
+Dyver is an application designed to aid in the general operation of an ROV, and contains an extensive pipeline for control and stabilization systems in particular. The repository comes with (some, namely SparkFun, Raspberry Pi, and BlueRobotics) drivers included!™ It additionally will have features for MATE ROV tasks.
 
 ## For Developers
 Useful information for developers working internally on Dyver.
