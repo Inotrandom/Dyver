@@ -30,6 +30,15 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
+    sdl_ttf
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf
+    GIT_TAG release-3.2.x
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+    USES_TERMINAL_DOWNLOAD TRUE
+)
+
+FetchContent_Declare(
     matplotplusplus
     GIT_REPOSITORY https://github.com/alandefreitas/matplotplusplus.git
     GIT_TAG master
@@ -49,8 +58,10 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(eigen)
 FetchContent_MakeAvailable(dss)
-FetchContent_MakeAvailable(sdl)
+FetchContent_MakeAvailable(sdl sdl_ttf)
 FetchContent_MakeAvailable(matplotplusplus)
+
+set(SDLTTF_VENDORED ON)
 
 add_subdirectory(src/test)
 
@@ -72,6 +83,7 @@ target_include_directories(
     ${dss_SOURCE_DIR}
     ${sdl_SOURCE_DIR}/include
     ${matplotplusplus_SOURCE_DIR}/source
+    ${sdl_ttf_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/_deps/matplotplusplus-build/source/matplot/
     src
 )

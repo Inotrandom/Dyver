@@ -15,6 +15,8 @@ add_executable(
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+set(SDLTTF_VENDORED ON)
+
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
