@@ -13,6 +13,8 @@ add_executable(
     ${CMAKE_BINARY_DIR}/_deps/dss-src/dss/cli.cpp
 )
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE

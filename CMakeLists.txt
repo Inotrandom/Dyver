@@ -63,6 +63,8 @@ add_executable(
     src/app.cpp
 )
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
