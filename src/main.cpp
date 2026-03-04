@@ -17,6 +17,7 @@ auto main(int argv, char **argc) -> int
 	(void)argv;
 	(void)argc;
 
+	// DSS
 	DSS::environment_t env = DSS::environment_t();
 
 	env.init();
@@ -27,12 +28,16 @@ auto main(int argv, char **argc) -> int
 		return 1;
 	}
 
+	// Dyver
 	app_t app = app_t(main_executor);
 
+	// Move DSS onto separate thread
 	std::thread cli_handle(command_line, main_executor);
 
+	// Run Dyver
 	app.run();
 
+	// Wait for the CLI to kill itself
 	cli_handle.join();
 
 	return 0;
