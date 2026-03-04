@@ -1,7 +1,7 @@
-#include "app.h"
 #include "SDL3/SDL_init.h"
-#include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
+
+#include "app.h"
 #include "ui/rectangle.h"
 
 void app_t::run()
@@ -23,13 +23,12 @@ void app_t::run()
 				kill();
 			}
 		}
-		// Render widgets
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
-		std::optional<SDL_FRect> sdlrect = rect.to_sdl_rect(window->get_sdl_window());
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_RenderFillRect(renderer, &sdlrect.value());
+
+		// Render widgets
+		rect.render(renderer, window->get_sdl_window());
 
 		SDL_RenderPresent(renderer);
 	}

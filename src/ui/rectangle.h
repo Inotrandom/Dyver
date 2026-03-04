@@ -8,8 +8,9 @@
 #include <optional>
 
 #include "widget.h"
+#include "renderobj.h"
 
-class rectangle_t
+class rectangle_t : public renderobj_t
 {
 public:
 	explicit rectangle_t() {}
@@ -41,6 +42,13 @@ public:
 		res.w = (posbb->x - posaa->x);
 
 		return res;
+	}
+
+	void render(SDL_Renderer *renderer, SDL_Window *window) override
+	{
+		std::optional<SDL_FRect> sdlrect = to_sdl_rect(window);
+		SDL_SetRenderDrawColor(renderer, m_color.r, m_color.g, m_color.b, m_color.a);
+		SDL_RenderFillRect(renderer, &sdlrect.value());
 	}
 
 private:
