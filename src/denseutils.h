@@ -56,6 +56,12 @@ inline auto quat_from_euler(Eigen::Vector3d euler) -> Eigen::Quaterniond
 	return res;
 }
 
+/**
+ * @brief Formats an `Eigen::Vector3d` as a string (x y z)
+ *
+ * @param which The vector to format
+ * @return std::string
+ */
 inline auto fmt_vector3d(const Eigen::Vector3d &which) -> std::string
 {
 	std::stringstream fmt;
