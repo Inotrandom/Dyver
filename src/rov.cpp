@@ -4,6 +4,12 @@
 
 #include <Eigen/Dense>
 
+/**
+ * @brief Iterates through thrusters and optimizes each individual one using `rov_t::optimize_thruster`
+ *
+ * @param target_translational Passed to `rov_t::optimize_thruster`
+ * @param target_rotational Passed to `rov_t::optimize_thruster`
+ */
 void rov_t::optimize_throttle_config(Eigen::Vector3d target_translational, Eigen::Vector3d target_rotational)
 {
 	for (auto [id, p_thruster] : m_thrusters)
@@ -12,6 +18,14 @@ void rov_t::optimize_throttle_config(Eigen::Vector3d target_translational, Eigen
 	}
 }
 
+/**
+ * @brief Calculates the force and torque that `which` produces, then uses `Eigen::MatrixBase::cross` and `Eigen::MatrixBase::dot` to calculate how "effective"
+ * the thruster is at achieving `target_translational` and `target_rotational`
+ *
+ * @param which Pointer to the thruster and is used to get thruster data and store the result (`m_target_congruence`)
+ * @param target_translational Normalized and used to compare against the thruster in a linear fashion
+ * @param target_rotational Normalized and used to compare against the thruster in a rotational fashion
+ */
 void rov_t::optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d &target_translational, Eigen::Vector3d &target_rotational)
 {
 	Eigen::Vector3d &look = which->get_look();
