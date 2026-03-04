@@ -34,10 +34,10 @@ public:
 	 * @param request The starting request that this object is making.
 	 * @param priority The priority of the request.
 	 */
-	dynamic_amp_request_t(const double request, const AMP_REQUEST_PRIORITY priority)
+	dynamic_amp_request_t(const double request_A, const AMP_REQUEST_PRIORITY priority)
 	{
-		m_request = request;
-		m_allowance = 0.0;
+		m_request_A = request_A;
+		m_allowance_A = 0.0;
 		m_priority = priority;
 	}
 
@@ -47,24 +47,24 @@ public:
 	 */
 	dynamic_amp_request_t()
 	{
-		m_request = 0.0;
-		m_allowance = 0.0;
+		m_request_A = 0.0;
+		m_allowance_A = 0.0;
 		m_priority = AMP_REQUEST_PRIORITY::DISTRIBUTE;
 	}
 
-	auto get_request() -> double { return m_request; }
+	auto get_request() -> double { return m_request_A; }
 
 	auto get_priority() -> AMP_REQUEST_PRIORITY { return m_priority; }
 
-	auto get_allowance() -> double & { return m_allowance; }
+	auto get_allowance() -> double & { return m_allowance_A; }
 
 	/**
 	 * @brief Allow this request to use amperage.
 	 * Will not set the "computed" property.
 	 */
-	void set_allowance(double n) { m_allowance = n; }
+	void set_allowance(double n) { m_allowance_A = n; }
 
-	void reset_allowance() { m_allowance = 0.0; }
+	void reset_allowance() { m_allowance_A = 0.0; }
 
 	/**
 	 * @brief Set this request's "computed" status to "true"
@@ -84,7 +84,7 @@ public:
 	/**
 	 * @brief Shorthand for `this->get_allowance() == this->get_request()`
 	 */
-	auto is_fulfilled() -> bool { return (m_request == m_allowance); }
+	auto is_fulfilled() -> bool { return (m_request_A == m_allowance_A); }
 
 private:
 	/**
@@ -101,20 +101,20 @@ private:
 	/**
 	 * @brief Amount of amperage requested
 	 */
-	double m_request{0.0};
+	double m_request_A{0.0};
 
 	/**
 	 * @brief Amount of amperage allowed
 	 */
-	double m_allowance{0.0};
+	double m_allowance_A{0.0};
 };
 
 class amp_distributor_t
 {
 public:
-	amp_distributor_t(const double max_allowance)
+	amp_distributor_t(const double max_allowance_A)
 	{
-		m_max_allowance = max_allowance;
+		m_max_allowance_A = max_allowance_A;
 		m_active_requests = {};
 	}
 
@@ -147,7 +147,7 @@ private:
 	 * @brief The total amount of amperage that this distributor is entitled to give out.
 	 *
 	 */
-	double m_max_allowance{0.0};
+	double m_max_allowance_A{0.0};
 
 	/**
 	 * @brief A vector of active amperage requests.

@@ -73,7 +73,7 @@ auto amp_distributor_t::min_variable_request() -> std::shared_ptr<dynamic_amp_re
 void amp_distributor_t::compute()
 {
 	// Splitting the cake between requests
-	double cake = m_max_allowance;
+	double cake = m_max_allowance_A;
 
 	for (auto request : m_active_requests)
 	{

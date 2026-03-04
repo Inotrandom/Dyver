@@ -7,14 +7,14 @@
 /**
  * @brief Iterates through thrusters and optimizes each individual one using `rov_t::optimize_thruster`
  *
- * @param target_translational Passed to `rov_t::optimize_thruster`
- * @param target_rotational Passed to `rov_t::optimize_thruster`
+ * @param target_translational_N Passed to `rov_t::optimize_thruster`
+ * @param target_rotational_Nm Passed to `rov_t::optimize_thruster`
  */
-void rov_t::optimize_throttle_config(Eigen::Vector3d target_translational, Eigen::Vector3d target_rotational)
+void rov_t::optimize_throttle_config(Eigen::Vector3d target_translational_N, Eigen::Vector3d target_rotational_Nm)
 {
 	for (auto [id, p_thruster] : m_thrusters)
 	{
-		optimize_thruster(p_thruster, target_translational, target_rotational);
+		optimize_thruster(p_thruster, target_translational_N, target_rotational_Nm);
 	}
 }
 
@@ -23,10 +23,10 @@ void rov_t::optimize_throttle_config(Eigen::Vector3d target_translational, Eigen
  * the thruster is at achieving `target_translational` and `target_rotational`
  *
  * @param which Pointer to the thruster and is used to get thruster data and store the result (`m_target_congruence`)
- * @param target_translational Normalized and used to compare against the thruster in a linear fashion
- * @param target_rotational Normalized and used to compare against the thruster in a rotational fashion
+ * @param target_translational_N Normalized and used to compare against the thruster in a linear fashion
+ * @param target_rotational_Nm Normalized and used to compare against the thruster in a rotational fashion
  */
-void rov_t::optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d &target_translational, Eigen::Vector3d &target_rotational)
+void rov_t::optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d &target_translational_N, Eigen::Vector3d &target_rotational_Nm)
 {
 	Eigen::Vector3d &look = which->get_look();
 	Eigen::Vector3d &pos = which->get_pos();
@@ -34,7 +34,7 @@ void rov_t::optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d
 	double final_congruence = 0.0;
 
 	// Thruster lookat target
-	const Eigen::Vector3d lookat = target_translational.normalized();
+	const Eigen::Vector3d lookat = target_translational_N.normalized();
 
 	const double dot = lookat.dot(look);
 
@@ -43,7 +43,7 @@ void rov_t::optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d
 	const Eigen::Vector3d calc_torque = pos.cross(look);
 	const Eigen::Vector3d calc_torque_direction = calc_torque.normalized();
 
-	const Eigen::Vector3d lookat_torque = target_rotational.normalized();
+	const Eigen::Vector3d lookat_torque = target_rotational_Nm.normalized();
 
 	const double torque_dot = lookat_torque.dot(calc_torque_direction);
 

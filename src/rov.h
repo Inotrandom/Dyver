@@ -22,11 +22,11 @@ public:
 	 * @param pos Position of the thruster
 	 * @param look Look vector of the thruster (thrusters are really simple!)
 	 */
-	void create_thruster(const Eigen::Vector3d pos, const Eigen::Vector3d look, const double force, const std::string id)
+	void create_thruster(const Eigen::Vector3d pos_m, const Eigen::Vector3d look, const double force_N, const std::string id)
 	{
 		ensure_is_unit(look);
 
-		std::shared_ptr<thruster_t> new_thruster = std::make_shared<thruster_t>(pos, look, force);
+		std::shared_ptr<thruster_t> new_thruster = std::make_shared<thruster_t>(pos_m, look, force_N);
 		m_thrusters[id] = new_thruster;
 	}
 
@@ -44,27 +44,26 @@ public:
 			Eigen::Vector3d &look = thruster->get_look();
 			Eigen::Vector3d &pos = thruster->get_pos();
 
-			Eigen::Vector3d tau = pos.cross(look);
+			Eigen::Vector3d tau_Nm = pos.cross(look);
 
 			if (factor_throttle)
 			{
-				tau *= thruster->get_output();
+				tau_Nm *= thruster->get_output();
 			}
 
-			sum += tau;
+			sum += tau_Nm;
 		}
 
 		return sum;
 	}
 
 	/**
-	 * @brief Throttle each thruster correctly to maximize the "correctness" of the direction
-	 * towards a target point. Magnitude is arbitrarily 1 N of force.
+	 * @brief Optimize the values of thrusters to control the ROV's unbalanced force output direction and torque
 	 *
-	 * @param target The target point to optimize the configuration towards. Should be within
-	 * world space.
+	 * @param target_translational_N Target force direction for linear forces
+	 * @param target_rotational_Nm  Target force direction for rotational (torque) forces
 	 */
-	void optimize_throttle_config(Eigen::Vector3d target, Eigen::Vector3d target_rotational);
+	void optimize_throttle_config(Eigen::Vector3d target_translational_N, Eigen::Vector3d target_rotational_Nm);
 
 	/**
 	 * @brief Obtain a reference to the internal thruster map of this ROV
@@ -83,12 +82,6 @@ private:
 	 *
 	 */
 	std::shared_ptr<rectprism_t> m_shape;
-
-	/**
-	 * @brief World rotation of the ROV
-	 *
-	 */
-	Eigen::Quaterniond m_rot;
 
 	/**
 	 * @brief Optimize a specific thruster towards a target.
