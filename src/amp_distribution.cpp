@@ -1,5 +1,12 @@
 #include "amp_distribution.h"
 
+/**
+ * @brief Creates a new request on the heap, stores it in `m_active_requests`, and then recomputes.
+ *
+ * @param request Passed to the constructor of dynamic_amp_request_t
+ * @param priority Passed to the constructor of dynamic_amp_request_t
+ * @return std::shared_ptr<dynamic_amp_request_t> Pointer to the new request after recomputation
+ */
 auto amp_distributor_t::invoke_request(const double request, const AMP_REQUEST_PRIORITY priority) -> std::shared_ptr<dynamic_amp_request_t>
 {
 	std::shared_ptr<dynamic_amp_request_t> new_request = std::make_shared<dynamic_amp_request_t>(request, priority);
@@ -10,6 +17,12 @@ auto amp_distributor_t::invoke_request(const double request, const AMP_REQUEST_P
 	return new_request;
 }
 
+/**
+ * @brief Iterates over requests and tallies the requests that match `which`
+ *
+ * @param which `AMP_REQUEST_PRIORITY` to test every active request against
+ * @return std::uint32_t Clone of a local variable that is incremented upon a match between `which` and an element in `m_active_requests`
+ */
 auto amp_distributor_t::tally_by_priority(const AMP_REQUEST_PRIORITY which) -> std::uint32_t
 {
 	std::uint32_t res = 0;
@@ -27,6 +40,13 @@ auto amp_distributor_t::tally_by_priority(const AMP_REQUEST_PRIORITY which) -> s
 	return res;
 }
 
+/**
+ * @brief Iterates over active requests, passes "ALWAYS_FULFILL" requests, and attempts to find a request lower in value than the lowest previously encountered.
+ * The "lowest previously encountered" request value is initialized to INFINITY.
+ *
+ * @return std::shared_ptr<dynamic_amp_request_t> A local variable initialized to nullptr is populated with an address upon every time the "lowest previously
+ * encountered" value is higher than the currently tested value.
+ */
 auto amp_distributor_t::min_variable_request() -> std::shared_ptr<dynamic_amp_request_t>
 {
 	double found_min = INFINITY;
@@ -46,6 +66,10 @@ auto amp_distributor_t::min_variable_request() -> std::shared_ptr<dynamic_amp_re
 	return p_found;
 }
 
+/**
+ * @brief Segments a cake base on the `m_max_allowance` and intelligently distributes amperage among requests as efficiently as possible.
+ *
+ */
 void amp_distributor_t::compute()
 {
 	// Splitting the cake between requests
