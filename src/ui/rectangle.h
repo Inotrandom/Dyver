@@ -10,6 +10,10 @@
 #include "widget.h"
 #include "renderobj.h"
 
+/**
+ * @brief Abstracted renderable ui_pos_t rectangle
+ *
+ */
 class rectangle_t : public renderobj_t
 {
 public:
@@ -23,6 +27,13 @@ public:
 		m_color = color;
 	}
 
+	/**
+	 * @brief Produces an SDL rect and translates ui_pos_t using the window
+	 *
+	 * @param window an SDL window used to retrieve viewport size
+	 * @return std::optional<SDL_FRect>
+	 * @return std::nullopt if getting a screen position fails (window may be nullptr)
+	 */
 	auto to_sdl_rect(SDL_Window *window) -> std::optional<SDL_FRect>
 	{
 		SDL_FRect res;
@@ -44,6 +55,12 @@ public:
 		return res;
 	}
 
+	/**
+	 * @brief Render this rectangle
+	 *
+	 * @param renderer A renderer to render the rectangle on
+	 * @param window A window to extrapolate screenpos from
+	 */
 	void render(SDL_Renderer *renderer, SDL_Window *window) override
 	{
 		std::optional<SDL_FRect> sdlrect = to_sdl_rect(window);
