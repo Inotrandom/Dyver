@@ -4,6 +4,11 @@
 #include "app.h"
 #include "ui/rectangle.h"
 
+/**
+ * @brief Main application loop for dyver. Initializes SDL, produces a window, initializes widgets, and then handles SDL events and renders widgets in a while
+ * loop.
+ *
+ */
 void app_t::run()
 {
 	SDL_Init(SDL_INIT_VIDEO);
