@@ -30,6 +30,12 @@ public:
 		m_thrusters[id] = new_thruster;
 	}
 
+	/**
+	 * @brief Sum unbalanced torque produced by thrusters
+	 *
+	 * @param factor_throttle Whether or not to consider the current throttles of every thruster
+	 * @return Eigen::Vector3d Nm unbalanced torque
+	 */
 	auto calculate_unbalanced_torque(const bool factor_throttle = false) -> Eigen::Vector3d
 	{
 		if (m_thrusters.size() == 0)
