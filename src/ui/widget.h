@@ -5,12 +5,20 @@
 
 #include <optional>
 
+/**
+ * @brief Two-dimensional spatial point
+ *
+ */
 struct point_xy_t
 {
 	double x = 0.0;
 	double y = 0.0;
 };
 
+/**
+ * @brief Position relatively sized to a SDL window
+ *
+ */
 struct ui_pos_t
 {
 	point_xy_t pos;
@@ -21,6 +29,12 @@ struct ui_pos_t
 		pos.y = ay;
 	}
 
+	/**
+	 * @brief Produces a screen position in px using an SDL window
+	 *
+	 * @param window the window to use as the viewport
+	 * @return std::optional<point_xy_t> screen position in px relative to `window`
+	 */
 	auto screen_pos(SDL_Window *window) -> std::optional<point_xy_t>
 	{
 		int w = 0;
