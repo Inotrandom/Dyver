@@ -3,14 +3,12 @@
 
 #include <thread>
 
+#include <iostream>
+
 #include "app.h"
 
 const std::string MAIN_CLI_NAME = "dyver-dss";
-void command_line(std::shared_ptr<DSS::executor_t> p_exec)
-{
-	DSS::cli_t cli = DSS::cli_t(p_exec, MAIN_CLI_NAME);
-	cli.init();
-}
+void command_line(DSS::cli_t *p_cli) { p_cli->init(); }
 
 auto main(int argv, char **argc) -> int
 {
@@ -28,16 +26,18 @@ auto main(int argv, char **argc) -> int
 		return 1;
 	}
 
+	DSS::cli_t *p_cli = new DSS::cli_t(main_executor, MAIN_CLI_NAME);
+
 	// Dyver
 	app_t app = app_t(main_executor);
 
 	// Move DSS onto separate thread
-	std::thread cli_handle(command_line, main_executor);
+	std::thread cli_handle(command_line, p_cli);
 
 	// Run Dyver
 	app.run();
 
-	// Wait for the CLI to kill itself
+	p_cli->kill();
 	cli_handle.join();
 
 	return 0;

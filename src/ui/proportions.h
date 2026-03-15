@@ -1,0 +1,7 @@
+#ifndef H_PROPORTIONS
+#define H_PROPORTIONS
+
+const float DEFAULT_RENDER_SCALE = 1.0;
+const float DEFAULT_TEXT_RENDER_SCALE = 1.0;
+
+#endif // H_PROPORTIONS

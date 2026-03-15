@@ -94,4 +94,5 @@ target_link_libraries(
     DSS
     matplot
     SDL3::SDL3
+    SDL3_ttf::SDL3_ttf
 )

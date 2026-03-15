@@ -7,6 +7,7 @@
 
 #include <optional>
 
+#include "ui/proportions.h"
 #include "widget.h"
 #include "renderobj.h"
 
@@ -63,6 +64,8 @@ public:
 	 */
 	void render(SDL_Renderer *renderer, SDL_Window *window) override
 	{
+		SDL_SetRenderScale(renderer, DEFAULT_RENDER_SCALE, DEFAULT_RENDER_SCALE);
+
 		std::optional<SDL_FRect> sdlrect = to_sdl_rect(window);
 		SDL_SetRenderDrawColor(renderer, m_color.r, m_color.g, m_color.b, m_color.a);
 		SDL_RenderFillRect(renderer, &sdlrect.value());
