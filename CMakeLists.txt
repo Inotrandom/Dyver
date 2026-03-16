@@ -63,15 +63,16 @@ FetchContent_MakeAvailable(matplotplusplus)
 
 set(SDLTTF_VENDORED ON)
 
-add_subdirectory(src/test)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/test)
+add_subdirectory(${CMAKE_SOURCE_DIR}/installer)
 
 add_executable(
     ${PROJECT_NAME}
-    src/main.cpp
-    src/rov.cpp
-    src/thruster/thruster.cpp
-    src/bindable_action.cpp
-    src/app.cpp
+    ${CMAKE_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/rov.cpp
+    ${CMAKE_SOURCE_DIR}/src/thruster/thruster.cpp
+    ${CMAKE_SOURCE_DIR}/src/bindable_action.cpp
+    ${CMAKE_SOURCE_DIR}/src/app.cpp
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
