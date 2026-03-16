@@ -3,8 +3,6 @@
 
 #include <thread>
 
-#include <iostream>
-
 #include "app.h"
 
 const std::string MAIN_CLI_NAME = "dyver-dss";
