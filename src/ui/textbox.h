@@ -42,6 +42,7 @@ public:
 
 	void rerender()
 	{
+		SDL_DestroySurface(m_surface); // Out with the old, in with the new
 		m_surface = TTF_RenderText_Blended(m_font, m_text.c_str(), 0, m_text_color);
 
 		m_queue_rerender_texture = true;
@@ -51,6 +52,7 @@ public:
 	{
 		if (m_queue_rerender_texture == true)
 		{
+			SDL_DestroyTexture(m_texture); // Clean slate
 			m_texture = SDL_CreateTextureFromSurface(renderer, m_surface);
 			m_queue_rerender_texture = false;
 		}
