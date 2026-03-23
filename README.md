@@ -48,7 +48,7 @@ Congratulations, Dyver is now fully ready for you to use.
 
 ## Installation (Developers)
 
-1. Build on Linux. If you haven't already, intall `cmake` and `clang` with its associated tools (such as `clang-format`)
+1. Build on Linux. If you haven't already, install `cmake` and `clang` with its associated tools (such as `clang-format`)
 2. Clone the repository.
 3. With the repository's master directory as your current working directory, execute `source deps.sh` to install dependencies.
 4. If you've done everything correctly, any Dyver target you choose should build successfully. Nice!
