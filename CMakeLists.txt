@@ -56,12 +56,13 @@ FetchContent_Declare(
     USES_TERMINAL_DOWNLOAD TRUE
 )
 
+set(SDLTTF_VENDORED ON)
+
 FetchContent_MakeAvailable(eigen)
 FetchContent_MakeAvailable(dss)
 FetchContent_MakeAvailable(sdl sdl_ttf)
 FetchContent_MakeAvailable(matplotplusplus)
 
-set(SDLTTF_VENDORED ON)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/test)
 add_subdirectory(${CMAKE_SOURCE_DIR}/installer)
