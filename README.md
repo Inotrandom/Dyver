@@ -20,22 +20,22 @@ The best first place to look will be the `issues` tab on GitHub. There, you will
 ### Conventions
 Keep the code clean!
 
-* Units of Measurement
+* Units of Measurement: 
 If the unit of measurement is unknown, assume SI standard. Place unit annotations after any variables that have units. Base units are preferrable, but some SI-prefixed units are acceptable (e.g. kg).
 
-* Formatting
+* Formatting: 
 Formatting rules are defined in the `.clang-format` file and should be used. Save our time, format your code. Snake case is heavily encouraged. Use `.h` for header files and `.cpp` for source files.
 
-* Documentation
+* Documentation: 
 Write documentation with Doxygen. Use `javadoc` style documentation comments when documenting internal code. Prefer a documentation on the function of the code rather than the implementation of the code, but always prefer documenting the implementation of the code if it has been declared elsewhere (`.h` vs `.cpp`).
 
-* Dependencies
+* Dependencies: 
 Create an issue requesting a dependency before any pull requests or changes. After a project manager (most like Estelle Coonan) reviews the issue, it will then be decided upon. Please keep things organized.
 
-* Compilation
+* Compilation: 
 Prefer `clang` and its set of tools. Release code will be compiled with `clang`, so ensure that your code works on `clang` before pushing it.
 
-* Testing
+* Testing: 
 `src/test/test.cpp`. Write testing code here. Tests are highly encouraged for code whose functionality can be easily tested.
 
 ## Installation (Users)
