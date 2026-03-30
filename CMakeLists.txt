@@ -69,11 +69,11 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/installer)
 
 add_executable(
     ${PROJECT_NAME}
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/rov.cpp
+    ${CMAKE_SOURCE_DIR}/src/topside/topside.cpp
+    ${CMAKE_SOURCE_DIR}/src/topside/core/rov.cpp
     ${CMAKE_SOURCE_DIR}/src/thruster/thruster.cpp
     ${CMAKE_SOURCE_DIR}/src/bindable_action.cpp
-    ${CMAKE_SOURCE_DIR}/src/app.cpp
+    ${CMAKE_SOURCE_DIR}/src/topside/app.cpp
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)

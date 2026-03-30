@@ -3,14 +3,14 @@
 #include <string>
 #include <thread>
 
-#include "amp_distribution.h"
+#include "topside/core/amp_distribution.h"
 #include "networking/server/nwserver.h"
 
 #include "networking/socket_helper.h"
 
 #include "DSS.h"
 
-#include "rov.h"
+#include "topside/core/rov.h"
 
 #include "utils.h"
 

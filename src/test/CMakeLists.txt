@@ -7,13 +7,13 @@ add_compile_options(-Wpedantic -Wall -Wextra)
 add_executable(
     ${PROJECT_NAME}
     test.cpp
-    ../amp_distribution.cpp
-    ../rov.cpp
-    ../networking/socket_helper.cpp
+    ${CMAKE_SOURCE_DIR}/src/topside/core/amp_distribution.cpp
+    ${CMAKE_SOURCE_DIR}/src/topside/core/rov.cpp
+    ${CMAKE_SOURCE_DIR}/src/networking/socket_helper.cpp
     ${CMAKE_BINARY_DIR}/_deps/dss-src/dss/cli.cpp
 )
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 
 set(SDLTTF_VENDORED ON)
 

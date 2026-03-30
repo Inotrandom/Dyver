@@ -5,11 +5,11 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_surface.h"
 #include "SDL3_ttf/SDL_ttf.h"
-#include "ui/proportions.h"
+#include "proportions.h"
 
-#include "ui/renderobj.h"
-#include "ui/rectangle.h"
-#include "ui/fontloader.h"
+#include "renderobj.h"
+#include "rectangle.h"
+#include "fontloader.h"
 
 #include <algorithm>
 #include <string>

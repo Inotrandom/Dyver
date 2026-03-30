@@ -7,7 +7,7 @@
 
 #include <optional>
 
-#include "ui/proportions.h"
+#include "proportions.h"
 #include "widget.h"
 #include "renderobj.h"
 
