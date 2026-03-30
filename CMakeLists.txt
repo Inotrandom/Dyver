@@ -3,7 +3,7 @@
 # (Most likely Estelle Coonan)
 
 cmake_minimum_required(VERSION 3.16)
-project(Dyver VERSION 0.0.0 LANGUAGES CXX)
+project(DyverTopside VERSION 0.0.0 LANGUAGES CXX)
 
 add_compile_options(-Wpedantic -Wall -Wextra)
 
@@ -63,10 +63,6 @@ FetchContent_MakeAvailable(dss)
 FetchContent_MakeAvailable(sdl sdl_ttf)
 FetchContent_MakeAvailable(matplotplusplus)
 
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/test)
-add_subdirectory(${CMAKE_SOURCE_DIR}/installer)
-
 add_executable(
     ${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/topside/topside.cpp
@@ -98,3 +94,7 @@ target_link_libraries(
     SDL3::SDL3
     SDL3_ttf::SDL3_ttf
 )
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/test)
+add_subdirectory(${CMAKE_SOURCE_DIR}/installer)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/robot)
