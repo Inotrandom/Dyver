@@ -10,10 +10,10 @@
  * @brief Abstract thruster; purely a mathematical object
  *
  */
-class thruster_t
+class abstract_thruster_t
 {
 public:
-	thruster_t(const Eigen::Vector3d pos_m, const Eigen::Vector3d look, const double force_N)
+	abstract_thruster_t(const Eigen::Vector3d pos_m, const Eigen::Vector3d look, const double force_N)
 	{
 		m_pos_m = pos_m;
 		m_look = look;
@@ -81,6 +81,6 @@ private:
 	Eigen::Vector3d m_look{Eigen::Vector3d(0, 0, 0)}; // Tada! Thrusters are very simple...
 };
 
-typedef std::map<std::string, std::shared_ptr<thruster_t>> thrusters_t;
+typedef std::map<std::string, std::shared_ptr<abstract_thruster_t>> thrusters_t;
 
 #endif

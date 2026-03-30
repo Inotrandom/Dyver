@@ -26,7 +26,7 @@ void rov_t::optimize_throttle_config(Eigen::Vector3d target_translational_N, Eig
  * @param target_translational_N Normalized and used to compare against the thruster in a linear fashion
  * @param target_rotational_Nm Normalized and used to compare against the thruster in a rotational fashion
  */
-void rov_t::optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d &target_translational_N, Eigen::Vector3d &target_rotational_Nm)
+void rov_t::optimize_thruster(std::shared_ptr<abstract_thruster_t> which, Eigen::Vector3d &target_translational_N, Eigen::Vector3d &target_rotational_Nm)
 {
 	Eigen::Vector3d &look = which->get_look();
 	Eigen::Vector3d &pos = which->get_pos();

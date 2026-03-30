@@ -26,7 +26,7 @@ public:
 	{
 		ensure_is_unit(look);
 
-		std::shared_ptr<thruster_t> new_thruster = std::make_shared<thruster_t>(pos_m, look, force_N);
+		std::shared_ptr<abstract_thruster_t> new_thruster = std::make_shared<abstract_thruster_t>(pos_m, look, force_N);
 		m_thrusters[id] = new_thruster;
 	}
 
@@ -95,7 +95,7 @@ private:
 	 * @param which
 	 * @param target
 	 */
-	void optimize_thruster(std::shared_ptr<thruster_t> which, Eigen::Vector3d &target, Eigen::Vector3d &target_rotational);
+	void optimize_thruster(std::shared_ptr<abstract_thruster_t> which, Eigen::Vector3d &target, Eigen::Vector3d &target_rotational);
 };
 
 #endif
