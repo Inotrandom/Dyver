@@ -1,6 +1,5 @@
 sudo apt install libpng-dev
 sudo apt install gnuplot
-sudo apt-install libsd3-ttf-dev
 
 sudo apt-get install build-essential git make \
 pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
