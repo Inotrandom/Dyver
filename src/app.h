@@ -26,7 +26,11 @@ public:
 	 *
 	 * @param title Title of the window
 	 */
-	window_helper_t(std::string title) { sdl_window = SDL_CreateWindow(title.c_str(), 700, 300, 0); }
+	window_helper_t(std::string title, bool resizable = true)
+	{
+		sdl_window = SDL_CreateWindow(title.c_str(), 700, 300, 0);
+		SDL_SetWindowResizable(sdl_window, resizable);
+	}
 
 	/**
 	 * @brief Get the surface object
