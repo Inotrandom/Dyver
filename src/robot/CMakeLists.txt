@@ -9,3 +9,11 @@ add_executable(
     ${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/robot/robot.cpp
 )
+
+message(${wiringpi_SOURCE_DIR}/wiringPi)
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE
+    ${wiringpi_SOURCE_DIR}/wiringPi
+)

@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "wiringPi.h"
+
 auto main(int argv, char **argc) -> int
 {
 	(void)argv;

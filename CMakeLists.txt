@@ -56,11 +56,21 @@ FetchContent_Declare(
     USES_TERMINAL_DOWNLOAD TRUE
 )
 
-set(SDLTTF_VENDORED ON)
+FetchContent_Declare(
+    wiringpi
+    GIT_REPOSITORY https://github.com/WiringPi/WiringPi
+    GIT_TAG master
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+    USES_TERMINAL_DOWNLOAD TRUE
+)
 
+FetchContent_MakeAvailable(wiringpi)
+
+set(SDLTTF_VENDORED ON)
+FetchContent_MakeAvailable(sdl sdl_ttf)
 FetchContent_MakeAvailable(eigen)
 FetchContent_MakeAvailable(dss)
-FetchContent_MakeAvailable(sdl sdl_ttf)
 FetchContent_MakeAvailable(matplotplusplus)
 
 add_executable(
