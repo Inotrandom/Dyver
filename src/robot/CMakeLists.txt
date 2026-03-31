@@ -16,4 +16,5 @@ target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
     ${wiringpi_SOURCE_DIR}/wiringPi
+    ${eigen_SOURCE_DIR}
 )
