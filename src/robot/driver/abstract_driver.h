@@ -1,11 +1,12 @@
 #ifndef H_ABSTRACT_DRIVER
 #define H_ABSTRACT_DRIVER
 
+#include <cstdint>
 #include <string>
 #include <map>
 #include <any>
 
-enum DRIVER_TYPE
+enum class DRIVER_TYPE : std::uint8_t
 {
 	/**
 	 * @brief Sensors and anything that doesn't require a write interface to control systems
@@ -26,7 +27,26 @@ enum DRIVER_TYPE
 	READWRITE
 };
 
-enum DRIVER_CONNECTION_STATUS
+enum class DRIVER_SIGNATURE : std::uint8_t
+{
+	UNKNOWN,
+
+	/**
+	 * @brief Anything that can be treated as a thruster; this includes ESCs that control thrusters
+	 *
+	 */
+	THRUSTER,
+	IMU,
+
+	/**
+	 * @brief Generic servo. Prefer THRUSTER over this for thrusters.
+	 *
+	 */
+	SERVO,
+	CAMERA
+};
+
+enum class DRIVER_CONNECTION_STATUS : std::uint8_t
 {
 	FAILED,
 	SUCCEEDED
