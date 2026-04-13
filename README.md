@@ -6,7 +6,7 @@ Note: Dyver has not reached its MVP state. As such, some features may be complet
 Dyver is a set of applications specifically tailored to the operation of an ROV. It contains both a topside user interface as well as robot client software.
 
 ### Topside
-Dyver Topside (target `DyverTopside`) is your go-to command center for all of your ROVs. It can recieve telemetry, send instructions, and stream camera data from any robot running the Dyver Robot. 
+Dyver Topside (target `DyverTopside`) is your go-to command center for all of your ROVs. It can recieve telemetry, send instructions, and stream camera data from any robot running the Dyver Robot daemon.
 
 ### Robot
 Dyver Robot (target `DyverRobot`) will communicate with topside, manage sensors, and perform general flight controller tasks. It is important to note that the Dyver Robot application **is not a driver for a flight controller.** It is designed to run on what would traditionally be a companion computer, and uses an external IMU.
@@ -15,7 +15,7 @@ Dyver Robot (target `DyverRobot`) will communicate with topside, manage sensors,
 ### Getting Started
 Ready to jump on-deck and help us develop Dyver? Wonderful!
 
-The best first place to look will be the `issues` tab on GitHub. There, you will find an up-to-date list of all of our tasks and their status. Grab a `good first issue`, create a fork, and get to work! We recommend you read/write documentation if you're still stuck on where to begin.
+The best first place to look will be the `issues` tab on GitHub. There, you will find an up-to-date list of all of our tasks and their statuses. Grab a `good first issue` and get to work! We recommend you read/write documentation if you're still stuck on where to begin.
 
 ### Conventions
 Keep the code clean!
