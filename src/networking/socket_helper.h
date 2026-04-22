@@ -17,6 +17,7 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include <functional>
 
 #include <chrono>
 
@@ -65,7 +66,7 @@ struct msg_buf_t
 class listen_socket_t
 {
 public:
-	explicit listen_socket_t() { m_onrx = delegate_t<void (*)(const std::string)>(); }
+	explicit listen_socket_t() { m_onrx = delegate_t<std::function<void(const std::string)>>(); }
 	~listen_socket_t() {}
 
 	void initialize(std::uint64_t port)
@@ -219,7 +220,7 @@ public:
 		return res;
 	}
 
-	auto get_onrx() -> delegate_t<void (*)(const std::string)> & { return m_onrx; }
+	auto get_onrx() -> delegate_t<std::function<void(const std::string)>> & { return m_onrx; }
 
 	listen_socket_t(const listen_socket_t &) = delete;
 	listen_socket_t &operator=(const listen_socket_t &) = delete;
@@ -231,7 +232,7 @@ private:
 	msg_buf_t m_msg_buf;
 	std::string m_id;
 
-	delegate_t<void (*)(const std::string)> m_onrx;
+	delegate_t<std::function<void(const std::string)>> m_onrx;
 };
 
 class send_socket_t
