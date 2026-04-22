@@ -4,8 +4,8 @@
 #include <thread>
 
 #include "topside/core/amp_distribution.h"
-#include "networking/server/nwserver.h"
 
+#include "networking/networking_key.h"
 #include "networking/socket_helper.h"
 
 #include "DSS.h"
@@ -175,7 +175,9 @@ static std::string TEST_SOCKET_HELPER_CURRENT = "";
 
 static void run_server()
 {
-	listen_socket_t server = listen_socket_t(
+	listen_socket_t server = listen_socket_t();
+
+	server.get_onrx().connect(
 		[](const std::string s)
 		{
 			std::cout << "Recieved: " << s << std::endl;

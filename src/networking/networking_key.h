@@ -1,0 +1,11 @@
+#ifndef H_NETWORKING_KEY
+#define H_NETWORKING_KEY
+
+#define PORT_DSS 8080
+#define PORT_TELEMETRY 2505
+#define PORT_VIDEO 2501
+
+#define KILL_INIT_AFTER 60
+#define INIT_WAIT_S 1
+
+#endif // H_NETWORKING_KEY

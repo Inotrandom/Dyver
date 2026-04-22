@@ -16,6 +16,7 @@
 #include <arpa/inet.h>
 #include <thread>
 #include <unistd.h>
+#include <vector>
 
 #include <chrono>
 
@@ -27,6 +28,7 @@
 #include <sstream>
 
 #include "utils.h"
+#include "delegate.h"
 
 #define PROTOCOL_AUTO 0
 #define MSG_SIZE 1024
@@ -63,10 +65,8 @@ struct msg_buf_t
 class listen_socket_t
 {
 public:
-	explicit listen_socket_t() {}
+	explicit listen_socket_t() { m_onrx = delegate_t<void (*)(const std::string)>(); }
 	~listen_socket_t() {}
-
-	listen_socket_t(void (*onrx)(const std::string)) { m_onrx = onrx; }
 
 	void initialize(std::uint64_t port)
 	{
@@ -108,8 +108,11 @@ public:
 	 * @brief Accept a number of connections
 	 *
 	 * @param n The number of connections to accept
+	 *
+	 * @return true All connections were accepted
+	 * @return false One or more connections failed
 	 */
-	void accept_n(std::int16_t n)
+	auto accept_n(std::int16_t n) -> bool
 	{
 		std::cout << "listen socket is waiting for " << n << " connections" << std::endl;
 		bool all_accepted = false;
@@ -121,7 +124,7 @@ public:
 			if (i >= n)
 			{
 				utils::log("(listen socket) \"accept_n\" sequence terminated after " + std::to_string(n) + " iterations.");
-				return;
+				return false;
 			}
 
 			std::int16_t accepted = accept(m_socket_fd, nullptr, nullptr);
@@ -138,7 +141,7 @@ public:
 				{
 					utils::log("(listen socket) Connection terminated after too many failed accept calls.", utils::MSG_TYPE::ERROR);
 					kill();
-					return;
+					return true;
 				}
 
 				continue;
@@ -156,6 +159,8 @@ public:
 			std::thread rx_handle = std::thread(rx_thread, this, accepted);
 			rx_handle.detach();
 		}
+
+		return true;
 	}
 
 	void kill()
@@ -193,7 +198,8 @@ public:
 			if (msg[0] != '\0')
 			{
 				m_msg_buf << msg;
-				m_onrx(m_msg_buf.buf.back());
+
+				m_onrx.call<const std::string>(m_msg_buf.buf.back());
 			}
 
 			msg[0] = '\0';
@@ -201,6 +207,19 @@ public:
 
 		utils::log("(listen socket) Invalid send socket caught, RX terminated.");
 	}
+
+	auto get_connections() -> std::vector<std::int16_t>
+	{
+		std::vector<std::int16_t> res = {};
+		for (const auto &[key, pair] : m_connected)
+		{
+			res.push_back(key);
+		}
+
+		return res;
+	}
+
+	auto get_onrx() -> delegate_t<void (*)(const std::string)> & { return m_onrx; }
 
 	listen_socket_t(const listen_socket_t &) = delete;
 	listen_socket_t &operator=(const listen_socket_t &) = delete;
@@ -212,7 +231,7 @@ private:
 	msg_buf_t m_msg_buf;
 	std::string m_id;
 
-	void (*m_onrx)(const std::string s);
+	delegate_t<void (*)(const std::string)> m_onrx;
 };
 
 class send_socket_t
@@ -221,7 +240,15 @@ public:
 	explicit send_socket_t() {}
 	~send_socket_t() {}
 
-	void connect_to(std::uint64_t port, std::string inet_address)
+	/**
+	 * @brief Attempts to connect to an address and port
+	 *
+	 * @param port The port of the other computer to connect to
+	 * @param inet_address The address of the other computer
+	 * @return true Connection succeeded
+	 * @return false Connection failed, likely during a timeout
+	 */
+	auto connect_to(std::uint64_t port, std::string inet_address) -> bool
 	{
 		m_socket_fd = socket(AF_INET, SOCK_STREAM, PROTOCOL_AUTO);
 
@@ -261,7 +288,7 @@ public:
 				std::stringstream msg;
 				msg << "(send socket) Connection terminated after " << MAX_CONNECTION_RETRIES << " failed attempts. (timeout)";
 				utils::log(msg.str(), utils::MSG_TYPE::ERROR);
-				return;
+				return false;
 			}
 
 			std::int16_t res = connect(m_socket_fd, p_sock_addr, sizeof(m_address));
@@ -279,6 +306,8 @@ public:
 			utils::log("(send socket) Connection accepted on port \033[4m" + std::to_string(m_address.sin_port) + "\033[0m");
 			has_connected = true;
 		}
+
+		return true;
 	}
 
 	void kill()
