@@ -15,6 +15,7 @@ message(${wiringpi_SOURCE_DIR}/wiringPi)
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
     ${wiringpi_SOURCE_DIR}/wiringPi
     ${eigen_SOURCE_DIR}
 )

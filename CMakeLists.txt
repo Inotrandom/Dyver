@@ -87,13 +87,13 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
     ${eigen_SOURCE_DIR}
     ${dss_SOURCE_DIR}
     ${sdl_SOURCE_DIR}/include
     ${matplotplusplus_SOURCE_DIR}/source
     ${sdl_ttf_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/_deps/matplotplusplus-build/source/matplot/
-    src
 )
 
 target_link_libraries(
