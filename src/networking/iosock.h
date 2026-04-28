@@ -11,6 +11,7 @@
 #include <vector>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #include "delegate.h"
 #include "utils.h"
@@ -102,19 +103,25 @@ public:
 	 * @param my_port Port of the "my" socket on this end.
 	 * @param their_port Port of the "their" socket on the other end.
 	 */
-	void init(int my_port, int their_port, bool out = false, bool in = false)
+	void init(
+		int my_port, int their_port, bool out = false, bool in = false, std::string send_to_address = "127.0.0.1", std::string recieve_from_address = "0.0.0.0")
 	{
+		if (in == out && send_to_address == recieve_from_address)
+		{
+			throw std::runtime_error("Cannot perform both I/O if the source and destination addresses are the same");
+		}
+
 		utils::log("(iosock_t) Initializing iosock");
 		std::thread *handle_send = nullptr;
 		if (out)
 		{
-			handle_send = new std::thread(&iosock_t::open_out, this, my_port);
+			handle_send = new std::thread(&iosock_t::open_out, this, my_port, recieve_from_address);
 		}
 
 		std::thread *handle_recieve = nullptr;
 		if (in)
 		{
-			handle_recieve = new std::thread(&iosock_t::open_in, this, their_port);
+			handle_recieve = new std::thread(&iosock_t::open_in, this, their_port, send_to_address);
 		}
 
 		if (handle_send)
@@ -155,7 +162,7 @@ public:
 	}
 
 private:
-	void open_in(int iport)
+	void open_in(int iport, std::string i_inet_address)
 	{
 		std::this_thread::yield();
 		m_ifd = socket(AF_INET, SOCK_STREAM, PROTOCOL_AUTO);
@@ -170,7 +177,7 @@ private:
 		sockaddr_in their_address = sockaddr_in();
 		their_address.sin_family = AF_INET;
 		their_address.sin_port = htons(iport);
-		their_address.sin_addr.s_addr = INADDR_ANY;
+		their_address.sin_addr.s_addr = inet_addr(i_inet_address.c_str());
 
 		utils::log(i_logsig + " Attempting to connect to port " + std::to_string(iport));
 
@@ -210,7 +217,7 @@ private:
 		}
 	}
 
-	void open_out(int oport)
+	void open_out(int oport, std::string o_inet_address)
 	{
 		m_ofd = socket(AF_INET, SOCK_STREAM, PROTOCOL_AUTO);
 		std::string o_logsig = "(socket " + std::to_string(m_ofd) + ")";
@@ -223,7 +230,7 @@ private:
 		sockaddr_in m_my_address = sockaddr_in();
 		m_my_address.sin_family = AF_INET;
 		m_my_address.sin_port = htons(oport);
-		m_my_address.sin_addr.s_addr = INADDR_ANY;
+		m_my_address.sin_addr.s_addr = inet_addr(o_inet_address.c_str());
 
 		utils::log(o_logsig + " Attempting to bind to port " + std::to_string(oport));
 
