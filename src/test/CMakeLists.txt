@@ -10,6 +10,7 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/src/topside/core/amp_distribution.cpp
     ${CMAKE_SOURCE_DIR}/src/topside/core/rov.cpp
     ${CMAKE_BINARY_DIR}/_deps/dss-src/dss/cli.cpp
+    ${CMAKE_SOURCE_DIR}/include/cli/cli.cpp
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)

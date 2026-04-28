@@ -2,6 +2,7 @@
 #define H_UTILS
 
 #include <iostream>
+#include "cli/cli.h"
 
 namespace utils
 {
@@ -52,6 +53,11 @@ inline auto square(const double n) -> double { return n * n; }
  */
 inline void log(std::string s, MSG_TYPE type = MSG_TYPE::INFO)
 {
+	if (cli_t::NO_LOG == true)
+	{
+		return;
+	}
+
 	switch (type)
 	{
 	case (MSG_TYPE::WARN):

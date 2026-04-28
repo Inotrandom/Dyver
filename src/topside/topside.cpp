@@ -4,15 +4,36 @@
 #include <iostream>
 #include <thread>
 
+#include "networking/dyver/server.h"
+
+#include <cstring>
+
 #include "app.h"
+#include "cli/cli.h"
 
 const std::string MAIN_CLI_NAME = "dyver-dss";
 void command_line(DSS::cli_t *p_cli) { p_cli->init(); }
 
-auto main(int argv, char **argc) -> int
+auto main(int argc, char **argv) -> int
 {
-	(void)argv;
 	(void)argc;
+	(void)argv;
+
+	// This sucks, but I'm too lazy to do anything better
+	bool headless = false;
+	if (argc > 1)
+	{
+		if (strcmp(argv[1], "--headless") == 0)
+		{
+			headless = true;
+		}
+
+		if (strcmp(argv[1], "--help") == 0)
+		{
+			std::cout << "Usage: DyverTopside [OPTION]\n--headless\n\tRun CLI without the GUI\n\n--help\n\tShow this menu\n";
+			return 0;
+		}
+	}
 
 	// DSS
 	DSS::environment_t env = DSS::environment_t();
@@ -25,20 +46,37 @@ auto main(int argv, char **argc) -> int
 		return 1;
 	}
 
-	DSS::cli_t *p_cli = new DSS::cli_t(main_executor, MAIN_CLI_NAME);
+	server_t server = server_t();
 
-	// Dyver
-	app_t app = app_t(main_executor);
+	cli_t cli = cli_t();
+	cli.init();
 
-	// Move DSS onto separate thread
-	std::thread cli_handle(command_line, p_cli);
+	cli.get_on_input()->connect(
+		[&server](std::string got)
+		{
+			if (got == "server-verify")
+			{
+				server.verify_connection();
+			}
 
-	// Run Dyver
-	app.run();
+			if (got == "server-start")
+			{
+				server.init();
+			}
+		});
 
-	p_cli->kill();
-	std::cout << (char)(0x0A) << std::flush;
-	cli_handle.join();
+	if (headless == false)
+	{
+		// Dyver
+		app_t app = app_t(main_executor);
+
+		// Run Dyver
+		app.run();
+		std::cout << std::endl;
+
+		// Ew
+		std::terminate();
+	}
 
 	return 0;
 }

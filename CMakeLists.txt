@@ -80,6 +80,7 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/src/thruster/thruster.cpp
     ${CMAKE_SOURCE_DIR}/src/bindable_action.cpp
     ${CMAKE_SOURCE_DIR}/src/topside/app.cpp
+    ${CMAKE_SOURCE_DIR}/include/cli/cli.cpp
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
