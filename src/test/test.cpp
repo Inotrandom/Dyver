@@ -3,6 +3,8 @@
 #include <string>
 #include <thread>
 
+#define FLAG_DYVER_TEST
+
 #include "topside/core/amp_distribution.h"
 
 // #include "networking/networking_key.h"
@@ -10,6 +12,9 @@
 
 #include "networking/iosock.h"
 #include "networking/networking_key.h"
+
+#include "networking/dyver/client.h"
+#include "networking/dyver/server.h"
 
 // #include "networking/dyver_client.h"
 // #include "networking/dyver_server.h"
@@ -249,34 +254,75 @@ static const test_t TEST_IOSOCK = test_t("test_iosock", __LINE__,
 		iosock_t peer_a;
 		iosock_t peer_b;
 
-		peer_a.init(PORT_DSS, PORT_DSS, false, true);
+		peer_a.init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, "127.0.0.1", "127.0.0.5");
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		peer_b.init(PORT_DSS, PORT_DSS, true, false);
+		peer_b.init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, "127.0.0.5", "127.0.0.1");
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 
-		std::string tosend = "Meow!";
+		std::string tosendb = "Meow!";
+		std::string tosenda = "Woof!";
 		std::string recieved = "";
 
 		peer_b.get_onrx()->connect(
 			[&recieved](std::string msg)
 			{
 				recieved = msg;
-				std::cout << "Peer a Recieved: " << msg << std::endl;
+				std::cout << "Peer b Recieved: " << msg << std::endl;
 			});
 
-		peer_a << tosend;
+		peer_a << tosendb;
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
+
+		if (recieved != tosendb)
+		{
+			return false;
+		}
+
+		peer_a.get_onrx()->connect(
+			[&recieved](std::string msg)
+			{
+				recieved = msg;
+				std::cout << "Peer a recieved: " << msg << std::endl;
+			});
+
+		peer_b << tosenda;
+
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+
+		if (recieved != tosenda)
+		{
+			return false;
+		}
 
 		peer_a.kill();
 		peer_b.kill();
 
-		if (recieved == tosend)
-		{
-			return true;
-		}
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
-		return false;
+		return true;
+	});
+
+static const test_t TEST_CLIENT_SERVER = test_t("test_client_server", __LINE__,
+	[]()
+	{
+		client_t client;
+		server_t server;
+
+		server.init();
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		client.init();
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+
+		bool res = server.verify_connection();
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+
+		server.kill();
+		client.kill();
+
+		return res;
 	});
 
 #if 0
@@ -336,8 +382,8 @@ auto main() -> int
 	TEST_ABSTRACT_ROV.run(&passed_tests, &failed_tests);
 	TEST_DELEGATE.run(&passed_tests, &failed_tests);
 	TEST_IOSOCK.run(&passed_tests, &failed_tests);
+	TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
 	// TEST_SOCKET_HELPER.run(&passed_tests, &failed_tests);
-	// TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
 
 	std::cout << passed_tests << " tests passed" << std::endl;
 	std::cout << failed_tests << " tests failed" << std::endl;

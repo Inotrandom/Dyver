@@ -134,8 +134,6 @@ public:
 		{
 			handle_recieve->detach();
 		}
-
-		utils::log("(iosock_t) Iosock initialization completed");
 	}
 
 	auto get_onrx() -> std::shared_ptr<onrx_delegate_t> { return m_onrx; }
@@ -179,7 +177,7 @@ private:
 		their_address.sin_port = htons(iport);
 		their_address.sin_addr.s_addr = inet_addr(i_inet_address.c_str());
 
-		utils::log(i_logsig + " Attempting to connect to port " + std::to_string(iport));
+		utils::log(i_logsig + " Attempting to connect to port " + std::to_string(iport) + " at " + i_inet_address);
 
 		connection_loop(their_address, i_logsig);
 
@@ -193,6 +191,13 @@ private:
 		while (m_i_connected == false)
 		{
 			++attempt;
+
+			if (isfd_valid(m_ifd) == false)
+			{
+				utils::log(i_logsig + "Connection terminated after socket was forcibly closed", utils::MSG_TYPE::ERROR);
+				return;
+			}
+
 			int connect_res = connect(m_ifd, (struct sockaddr *)&their_address, sizeof(their_address));
 
 			if (connect_res == 0)
@@ -232,7 +237,7 @@ private:
 		m_my_address.sin_port = htons(oport);
 		m_my_address.sin_addr.s_addr = inet_addr(o_inet_address.c_str());
 
-		utils::log(o_logsig + " Attempting to bind to port " + std::to_string(oport));
+		utils::log(o_logsig + " Attempting to bind to port " + std::to_string(oport) + ", only listening to connections from " + o_inet_address);
 
 		int bind_res = bind(m_ofd, (const struct sockaddr *)&m_my_address, sizeof(m_my_address));
 		if (bind_res == INVALID)
@@ -241,7 +246,7 @@ private:
 			return;
 		}
 
-		utils::log(o_logsig + " Bind success, waiting for " + std::to_string(MAX_CONNECTIONS) + " connections");
+		utils::log(o_logsig + " Bind success, waiting for at most " + std::to_string(MAX_CONNECTIONS) + " connections");
 		(void)listen(m_ofd, MAX_CONNECTIONS);
 
 		std::thread accept_handle = std::thread(&iosock_t::accept_handler, this);
