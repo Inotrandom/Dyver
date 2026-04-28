@@ -12,6 +12,7 @@
 
 #include "networking/dyver/client.h"
 #include "networking/dyver/server.h"
+#include "cache/cache_manager.h"
 
 #include "DSS.h"
 
@@ -263,6 +264,34 @@ static const test_t TEST_CLIENT_SERVER = test_t("test_client_server", __LINE__,
 		return res;
 	});
 
+static const test_t TEST_CACHE_MANAGER = test_t("test_cache_manager", __LINE__,
+	[]()
+	{
+		cache_manager_t manager = cache_manager_t("test");
+		manager.write_buf("test_k", "test_p");
+		manager.write_buf("test_k2", "Multiline cache");
+
+		for (auto &[k, p] : *manager.get_cache())
+		{
+			std::cout << k << " : " << p << std::endl;
+		}
+
+		manager.rebuild_cache();
+		manager.load_cache();
+
+		if (manager.read_buf("test_k") != "test_p")
+		{
+			return false;
+		}
+
+		if (manager.read_buf("test_k2") != "Multiline cache")
+		{
+			return false;
+		}
+
+		return true;
+	});
+
 auto main() -> int
 {
 	std::cout << "Commencing Dyver Tests" << std::endl;
@@ -279,7 +308,7 @@ auto main() -> int
 	TEST_DELEGATE.run(&passed_tests, &failed_tests);
 	TEST_IOSOCK.run(&passed_tests, &failed_tests);
 	TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
-	// TEST_SOCKET_HELPER.run(&passed_tests, &failed_tests);
+	TEST_CACHE_MANAGER.run(&passed_tests, &failed_tests);
 
 	std::cout << passed_tests << " tests passed" << std::endl;
 	std::cout << failed_tests << " tests failed" << std::endl;
