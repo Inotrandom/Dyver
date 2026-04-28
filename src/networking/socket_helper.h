@@ -8,6 +8,8 @@
  *
  */
 
+// NOTE: THIS FILE HAS BEEN DEPRECATED!
+
 #ifndef H_SOCKET_HELPER
 #define H_SOCKET_HELPER
 
