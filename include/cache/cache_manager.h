@@ -113,6 +113,16 @@ public:
 
 	void write_buf(std::string k, std::string p) { (*m_cache_buffer)[k] = p; }
 
+	auto read_buf_or(std::string k, std::string def) -> std::string
+	{
+		if (m_cache_buffer->contains(k))
+		{
+			return read_buf(k);
+		}
+
+		return def;
+	}
+
 	auto read_buf(std::string k) -> std::string { return (*m_cache_buffer)[k]; }
 
 	void rebuild_cache()
