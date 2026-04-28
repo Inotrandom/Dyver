@@ -6,7 +6,7 @@
 #ifndef H_DENSE_UTILS
 #define H_DENSE_UTILS
 
-#include "utils.h"
+#include "cli/cli.h"
 
 #include <cmath>
 #include <sstream>

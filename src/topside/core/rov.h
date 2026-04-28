@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "denseutils.h"
-#include "utils.h"
+#include "cli/cli.h"
 #include "geometry/rectprism.h"
 
 #include "amp_distribution.h"

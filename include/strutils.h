@@ -29,6 +29,11 @@ inline auto string_split(std::string s, const std::string &delimiter) -> std::ve
 	}
 	tokens.push_back(s);
 
+	if (tokens.empty())
+	{
+		tokens.push_back(s);
+	}
+
 	return tokens;
 }
 

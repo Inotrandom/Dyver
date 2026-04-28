@@ -14,7 +14,8 @@
 #include <arpa/inet.h>
 
 #include "delegate.h"
-#include "utils.h"
+
+#include "cli/cli.h"
 
 #include "networking_key.h"
 

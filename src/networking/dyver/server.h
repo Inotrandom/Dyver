@@ -10,6 +10,8 @@
 
 #include "networking/iosock.h"
 #include <memory>
+#include "cache/cache_manager.h"
+#include "cli/cli.h"
 
 class server_t
 {
@@ -25,8 +27,13 @@ public:
 	void init()
 	{
 #ifndef FLAG_DYVER_TEST
-		m_plaintext->init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, "0.0.0.0", "0.0.0.0");
-		m_video->init(PORT_VIDEO, PORT_VIDEO, false, true, "0.0.0.0", "0.0.0.0");
+		cache_manager_t cache = cache_manager_t("server");
+		cache.load_cache();
+		std::string send_address = cache.read_buf_or("send_to_address", "0.0.0.0");
+		std::string recv_address = cache.read_buf_or("recieve_from_address", "0.0.0.0");
+
+		m_plaintext->init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, send_address, recv_address);
+		m_video->init(PORT_VIDEO, PORT_VIDEO, false, true, send_address, recv_address);
 #endif
 #ifdef FLAG_DYVER_TEST
 		utils::log("(dyver server) NETWORKING TEST ENABLED");

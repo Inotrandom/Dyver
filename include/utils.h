@@ -1,8 +1,7 @@
 #ifndef H_UTILS
 #define H_UTILS
 
-#include <iostream>
-#include "cli/cli.h"
+#include <cmath>
 
 namespace utils
 {
@@ -30,13 +29,6 @@ constexpr double NANOU_T_U = (1.0e-9);
  */
 constexpr double KILOU_T_U = (1.0e3);
 
-enum MSG_TYPE
-{
-	INFO,
-	WARN,
-	ERROR
-};
-
 /**
  * @brief Returns the square of n
  *
@@ -44,45 +36,6 @@ enum MSG_TYPE
  * @return double Representing the result of the square operation
  */
 inline auto square(const double n) -> double { return n * n; }
-
-/**
- * @brief Log a nicely formatted string in the standard out
- *
- * @param type The type of the message (e.g. MSG_TYPE::WARN)
- * @param s The string message to output
- */
-inline void log(std::string s, MSG_TYPE type = MSG_TYPE::INFO)
-{
-	if (cli_t::NO_LOG == true)
-	{
-		return;
-	}
-
-	switch (type)
-	{
-	case (MSG_TYPE::WARN):
-	{
-		std::cout << "\033[93m[warning] ";
-		break;
-	}
-
-	case (MSG_TYPE::INFO):
-	{
-		std::cout << "\033[0m[info] ";
-		break;
-	}
-
-	case (MSG_TYPE::ERROR):
-	{
-		std::cout << "\033[91m[error] ";
-		break;
-	}
-	}
-
-	std::cout << s;
-
-	std::cout << "\033[0m\n" << std::flush;
-}
 
 struct linear_percentage_t
 {

@@ -1,6 +1,7 @@
 #ifndef DYVER_CLI_H
 #define DYVER_CLI_H
 
+#include "cache/cache_manager.h"
 #include "strutils.h"
 #include "delegate.h"
 #include <iostream>
@@ -64,8 +65,18 @@ public:
 
 	void parse(std::string what)
 	{
+		if (what.empty())
+		{
+			return;
+		}
+
 		std::string lower = to_lower(what);
 		string_trim(lower);
+
+		std::vector<std::string> tokens = string_split(lower, " ");
+		std::string id = tokens[0];
+		tokens.erase(tokens.begin());
+
 		m_oninput->call(lower);
 
 		if (lower == "exit")
@@ -103,6 +114,57 @@ public:
 				*/
 			return;
 		}
+
+		if (id == "wcache")
+		{
+			if (tokens.size() < 3)
+			{
+				return;
+			}
+
+			std::string name = tokens[0];
+			std::string key = tokens[1];
+			tokens.erase(tokens.begin(), tokens.begin() + 2);
+			std::string pair = vector_collect(tokens, " ");
+
+			cache_manager_t cache = cache_manager_t(name);
+			cache.load_cache();
+			cache.write_buf(key, pair);
+			cache.rebuild_cache();
+		}
+
+		if (id == "rcache")
+		{
+			if (tokens.size() < 2)
+			{
+				return;
+			}
+
+			std::string name = tokens[0];
+			std::string key = tokens[1];
+
+			cache_manager_t cache = cache_manager_t(name);
+			cache.load_cache();
+			std::cout << cache.read_buf_or(key, "<undefined>") << std::endl;
+		}
+
+		if (id == "cache-display")
+		{
+			if (tokens.size() < 1)
+			{
+				return;
+			}
+
+			std::string name = tokens[0];
+			cache_manager_t cache = cache_manager_t(name);
+			cache.load_cache();
+			std::size_t line_n = 0;
+			for (auto &[k, p] : *cache.get_cache())
+			{
+				++line_n;
+				std::cout << line_n << " : " << k << " = " << p << std::endl;
+			}
+		}
 	}
 
 	void clear()
@@ -125,5 +187,54 @@ private:
 	void esc() { std::cout << "\033["; }
 	std::shared_ptr<oninput_delegate_t> m_oninput = nullptr;
 };
+
+namespace utils
+{
+enum MSG_TYPE
+{
+	INFO,
+	WARN,
+	ERROR
+};
+
+/**
+ * @brief Log a nicely formatted string in the standard out
+ *
+ * @param type The type of the message (e.g. MSG_TYPE::WARN)
+ * @param s The string message to output
+ */
+inline void log(std::string s, MSG_TYPE type = MSG_TYPE::INFO)
+{
+	if (cli_t::NO_LOG == true)
+	{
+		return;
+	}
+
+	switch (type)
+	{
+	case (MSG_TYPE::WARN):
+	{
+		std::cout << "\033[93m[warning] ";
+		break;
+	}
+
+	case (MSG_TYPE::INFO):
+	{
+		std::cout << "\033[0m[info] ";
+		break;
+	}
+
+	case (MSG_TYPE::ERROR):
+	{
+		std::cout << "\033[91m[error] ";
+		break;
+	}
+	}
+
+	std::cout << s;
+
+	std::cout << "\033[0m\n" << std::flush;
+}
+} // namespace utils
 
 #endif // DYVER_CLI_H

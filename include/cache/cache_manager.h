@@ -5,12 +5,12 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <iostream>
 #include <vector>
 #include <map>
 #include <stdlib.h>
 
 #include "strutils.h"
-#include "utils.h"
 
 // clang-format off
 const std::vector<std::filesystem::path> CACHE_PATHS = 
@@ -70,7 +70,6 @@ public:
 
 			std::filesystem::create_directories(path);
 			path.append(m_name + ".cache");
-			utils::log("(cache_manager_t) Attempting to read cache from " + path.generic_string() + " (truncate: " + std::to_string(truncate) + ")");
 
 			if (std::filesystem::exists(path) == false)
 			{
@@ -162,7 +161,7 @@ private:
 			std::vector<std::string> tokens = string_split(line, LEX_KP);
 			if (tokens.size() != KP_SIZE)
 			{
-				utils::log("(cache_manager_t) Malformed key pair at line " + std::to_string(line_n) + ": (" + line + ")", utils::MSG_TYPE::ERROR);
+				std::cout << "(cache_manager_t) Malformed key pair at line " + std::to_string(line_n) + ": (" + line + ")" << std::endl;
 				return;
 			}
 
@@ -171,7 +170,7 @@ private:
 
 			if (m_cache_buffer->contains(tokens[0]))
 			{
-				utils::log("(cache_manager_t) Duplicate key at line " + std::to_string(line_n), utils::MSG_TYPE::ERROR);
+				std::cout << "(cache_manager_t) Duplicate key at line " + std::to_string(line_n) << std::endl;
 				return;
 			}
 
