@@ -7,6 +7,9 @@
 template <typename fn> class delegate_t
 {
 public:
+	explicit delegate_t() {}
+	~delegate_t() {}
+
 	template <typename... args> void call(args... a)
 	{
 		for (const auto function : m_connected)

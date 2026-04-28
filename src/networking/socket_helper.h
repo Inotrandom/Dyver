@@ -31,10 +31,7 @@
 #include "utils.h"
 #include "delegate.h"
 
-#define PROTOCOL_AUTO 0
-#define MSG_SIZE 1024
-
-#define MAX_CONNECTIONS 8
+#include "networking_key.h"
 
 #define MSG_SIZE 1024
 
@@ -66,8 +63,8 @@ struct msg_buf_t
 class listen_socket_t
 {
 public:
-	explicit listen_socket_t() { m_onrx = delegate_t<std::function<void(const std::string)>>(); }
-	~listen_socket_t() {}
+	explicit listen_socket_t() { m_onrx = std::make_shared<delegate_t<std::function<void(const std::string)>>>(); }
+	~listen_socket_t() { kill(); }
 
 	void initialize(std::uint64_t port)
 	{
@@ -94,11 +91,12 @@ public:
 		m_address.sin_addr.s_addr = INADDR_ANY;
 
 		sockaddr *p_sock_addr = (sockaddr *)&m_address;
-		int16_t bind_res = bind(m_socket_fd, p_sock_addr, sizeof(m_address));
+		int bind_res = bind(m_socket_fd, p_sock_addr, sizeof(m_address));
 
 		if (bind_res < 0)
 		{
-			utils::log("(listen socket) Failure to produce listen socket. (bind failure)", utils::MSG_TYPE::ERROR);
+			utils::log("(listen socket) Failure to produce listen socket. (bind failure, code " + std::to_string(bind_res) + ")", utils::MSG_TYPE::ERROR);
+			//	throw std::runtime_error("Listen socket bind failure");
 			return;
 		}
 
@@ -115,51 +113,39 @@ public:
 	 */
 	auto accept_n(std::int16_t n) -> bool
 	{
-		std::cout << "listen socket is waiting for " << n << " connections" << std::endl;
-		bool all_accepted = false;
-		std::int16_t i = 0;
-		std::int16_t exhaust = 0;
-
-		while (all_accepted == false)
+		if (is_dead() == true)
 		{
-			if (i >= n)
-			{
-				utils::log("(listen socket) \"accept_n\" sequence terminated after " + std::to_string(n) + " iterations.");
-				return false;
-			}
+			throw std::runtime_error("Dead socket cannot accept connections.");
+			return false;
+		}
 
-			std::int16_t accepted = accept(m_socket_fd, nullptr, nullptr);
+		std::cout << "listen socket is waiting for " << n << " connections (socket " << m_socket_fd << ")" << std::endl;
 
-			if (accepted < 0)
-			{
-				std::stringstream msg;
-				msg << "(listen socket) Failure to accept socket, invalid file descriptor. (socket " << m_socket_fd << ")";
+		int accepted = accept(m_socket_fd, nullptr, nullptr);
 
-				utils::log(msg.str());
-				++exhaust;
-
-				if (exhaust >= MAX_CONNECTION_RETRIES)
-				{
-					utils::log("(listen socket) Connection terminated after too many failed accept calls.", utils::MSG_TYPE::ERROR);
-					kill();
-					return true;
-				}
-
-				continue;
-			}
-
-			++i;
-
-			// Log it for the smelly humans
+		if (accepted < 0)
+		{
 			std::stringstream msg;
-			msg << "(listen socket) Socket connection accepted on port " << "\033[4m" << m_address.sin_port << "\033[0m";
+			msg << "(listen socket) Failure to accept socket, invalid file descriptor. (socket " << m_socket_fd << ", resulting fd " << accepted << ")";
+
 			utils::log(msg.str());
 
-			m_connected[accepted] = true;
-			// Spawn a handler for it
-			std::thread rx_handle = std::thread(rx_thread, this, accepted);
-			rx_handle.detach();
+			std::this_thread::sleep_for(RETRY_AFTER);
+
+			return false;
 		}
+
+		// Log it for the smelly humans
+		std::stringstream msg;
+		msg << "(listen socket) Socket connection accepted on port " << "\033[4m" << m_address.sin_port << "\033[0m";
+		utils::log(msg.str());
+
+		m_connected[accepted] = true;
+		// Spawn a handler for it
+		std::thread rx_handle = std::thread(rx_thread, this, accepted);
+		rx_handle.detach();
+
+		m_connection_status = true;
 
 		return true;
 	}
@@ -168,6 +154,11 @@ public:
 	{
 		if (m_socket_fd == INVALID_FD)
 			return;
+
+		for (auto [k, p] : m_connected)
+		{
+			close(k);
+		}
 
 		(void)close(m_socket_fd);
 		m_socket_fd = INVALID_FD;
@@ -200,7 +191,7 @@ public:
 			{
 				m_msg_buf << msg;
 
-				m_onrx.call<const std::string>(m_msg_buf.buf.back());
+				m_onrx->call<const std::string>(m_msg_buf.buf.back());
 			}
 
 			msg[0] = '\0';
@@ -220,26 +211,30 @@ public:
 		return res;
 	}
 
-	auto get_onrx() -> delegate_t<std::function<void(const std::string)>> & { return m_onrx; }
+	auto is_connected() -> bool { return m_connection_status; }
+
+	auto get_onrx() -> std::shared_ptr<delegate_t<std::function<void(const std::string)>>> { return m_onrx; }
 
 	listen_socket_t(const listen_socket_t &) = delete;
 	listen_socket_t &operator=(const listen_socket_t &) = delete;
 
 private:
+	bool m_connection_status = false;
+
 	sockaddr_in m_address = sockaddr_in();
-	std::int16_t m_socket_fd = INVALID_FD;
-	std::map<std::int16_t, bool> m_connected;
+	int m_socket_fd = INVALID_FD;
+	std::map<int, bool> m_connected;
 	msg_buf_t m_msg_buf;
 	std::string m_id;
 
-	delegate_t<std::function<void(const std::string)>> m_onrx;
+	std::shared_ptr<delegate_t<std::function<void(const std::string)>>> m_onrx;
 };
 
 class send_socket_t
 {
 public:
 	explicit send_socket_t() {}
-	~send_socket_t() {}
+	~send_socket_t() { kill(); }
 
 	/**
 	 * @brief Attempts to connect to an address and port
@@ -305,11 +300,14 @@ public:
 			}
 
 			utils::log("(send socket) Connection accepted on port \033[4m" + std::to_string(m_address.sin_port) + "\033[0m");
+			m_connection_status = true;
 			has_connected = true;
 		}
 
 		return true;
 	}
+
+	auto is_connected() -> bool { return m_connection_status; }
 
 	void kill()
 	{
@@ -329,6 +327,8 @@ public:
 	send_socket_t &operator=(const send_socket_t &) = delete;
 
 private:
+	bool m_connection_status;
+
 	sockaddr_in m_address = sockaddr_in();
 	std::int16_t m_socket_fd = INVALID_FD;
 	std::string m_id;

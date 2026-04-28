@@ -5,8 +5,14 @@
 
 #include "topside/core/amp_distribution.h"
 
+// #include "networking/networking_key.h"
+// #include "networking/socket_helper.h"
+
+#include "networking/iosock.h"
 #include "networking/networking_key.h"
-#include "networking/socket_helper.h"
+
+// #include "networking/dyver_client.h"
+// #include "networking/dyver_server.h"
 
 #include "DSS.h"
 
@@ -170,14 +176,15 @@ static const test_t TEST_ABSTRACT_ROV = test_t("test_abstract_rov", __LINE__,
 		return true;
 	});
 
+#if 0
 static bool TEST_SOCKET_HELPER_SUCCEEDED = true;
 static std::string TEST_SOCKET_HELPER_CURRENT = "";
 
-static void run_server()
+static void run_sockethelper_test_server()
 {
 	listen_socket_t server = listen_socket_t();
 
-	server.get_onrx().connect(
+	server.get_onrx()->connect(
 		[](const std::string s)
 		{
 			std::cout << "Recieved: " << s << std::endl;
@@ -195,7 +202,7 @@ static void run_server()
 	server.kill();
 }
 
-static void run_client()
+static void run_sockethelper_test_client()
 {
 	send_socket_t client = send_socket_t();
 	client.connect_to(PORT_DSS, "127.0.0.1");
@@ -215,15 +222,100 @@ static void run_client()
 static const test_t TEST_SOCKET_HELPER = test_t("test_socket_helper", __LINE__,
 	[]()
 	{
-		std::thread server_handle(run_server);
+		std::thread server_handle(run_sockethelper_test_server);
 		std::this_thread::yield();
-		std::thread client_handle(run_client);
+		std::thread client_handle(run_sockethelper_test_client);
 
 		server_handle.join();
 		client_handle.join();
 		return TEST_SOCKET_HELPER_SUCCEEDED;
 	});
+#endif
 
+static const test_t TEST_DELEGATE = test_t("test_delegate", __LINE__,
+	[]()
+	{
+		bool res = false;
+		std::shared_ptr<delegate_t<std::function<void()>>> del = std::make_shared<delegate_t<std::function<void()>>>();
+		del->connect([&res]() { res = true; });
+		del->call();
+
+		return res;
+	});
+
+static const test_t TEST_IOSOCK = test_t("test_iosock", __LINE__,
+	[]()
+	{
+		iosock_t peer_a;
+		iosock_t peer_b;
+
+		peer_a.init(PORT_DSS, PORT_DSS, false, true);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		peer_b.init(PORT_DSS, PORT_DSS, true, false);
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+
+		std::string tosend = "Meow!";
+		std::string recieved = "";
+
+		peer_b.get_onrx()->connect(
+			[&recieved](std::string msg)
+			{
+				recieved = msg;
+				std::cout << "Peer a Recieved: " << msg << std::endl;
+			});
+
+		peer_a << tosend;
+
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+
+		peer_a.kill();
+		peer_b.kill();
+
+		if (recieved == tosend)
+		{
+			return true;
+		}
+
+		return false;
+	});
+
+#if 0
+static void run_dyver_server_test()
+{
+	dyver_server_t server = dyver_server_t();
+	server.initialize("127.0.0.1");
+	std::this_thread::sleep_for(std::chrono::seconds(6));
+	server.verify_inet_connection();
+	std::this_thread::sleep_for(std::chrono::seconds(9));
+	server.kill();
+}
+
+static void run_dyver_client_test()
+{
+	dyver_client_t client = dyver_client_t();
+	client.initialize("127.0.0.1");
+	std::this_thread::sleep_for(std::chrono::seconds(15));
+	client.kill();
+}
+
+static const test_t TEST_CLIENT_SERVER = test_t("test_client_server", __LINE__,
+	[]()
+	{
+		utils::log("(test) Initializing Dyver Server");
+		std::thread server_handle(run_dyver_server_test);
+
+		server_handle.detach();
+
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+
+		utils::log("(test) Initializing Dyver Client");
+		std::thread client_handle(run_dyver_client_test);
+
+		client_handle.join();
+
+		return true;
+	});
+#endif
 /*
 static const test_t TEST_DENSE_UTILS = test_t("", __LINE__, [](){
 	quat_from_euler(Eigen::Vector3d());
@@ -242,7 +334,10 @@ auto main() -> int
 	TEST_AMP_DISTRIBUTOR.run(&passed_tests, &failed_tests);
 	TEST_PWM_THROTTLE.run(&passed_tests, &failed_tests);
 	TEST_ABSTRACT_ROV.run(&passed_tests, &failed_tests);
-	TEST_SOCKET_HELPER.run(&passed_tests, &failed_tests);
+	TEST_DELEGATE.run(&passed_tests, &failed_tests);
+	TEST_IOSOCK.run(&passed_tests, &failed_tests);
+	// TEST_SOCKET_HELPER.run(&passed_tests, &failed_tests);
+	// TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
 
 	std::cout << passed_tests << " tests passed" << std::endl;
 	std::cout << failed_tests << " tests failed" << std::endl;

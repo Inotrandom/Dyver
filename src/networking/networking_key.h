@@ -5,7 +5,18 @@
 #define PORT_TELEMETRY 2505
 #define PORT_VIDEO 2501
 
-#define KILL_INIT_AFTER 60
+#define KILL_INIT_AFTER 2
 #define INIT_WAIT_S 1
+
+#define COMMAND_PING "PING"
+#define RESPONSE_PONG "PONG"
+
+#define PROTOCOL_AUTO 0
+#define INVALID -1
+
+#define MAX_CONNECTIONS 32
+#define MSG_SIZE 1024
+
+#define MAX_RETRIES 32
 
 #endif // H_NETWORKING_KEY
