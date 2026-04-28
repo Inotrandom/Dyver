@@ -1,6 +1,7 @@
 #include "dss/runtime.h"
 #include "dss/DSS.h"
 
+#include <iostream>
 #include <thread>
 
 #include "app.h"
@@ -36,6 +37,7 @@ auto main(int argv, char **argc) -> int
 	app.run();
 
 	p_cli->kill();
+	std::cout << (char)(0x0A) << std::flush;
 	cli_handle.join();
 
 	return 0;

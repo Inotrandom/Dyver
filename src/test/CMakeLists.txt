@@ -9,7 +9,6 @@ add_executable(
     test.cpp
     ${CMAKE_SOURCE_DIR}/src/topside/core/amp_distribution.cpp
     ${CMAKE_SOURCE_DIR}/src/topside/core/rov.cpp
-    ${CMAKE_SOURCE_DIR}/src/networking/socket_helper.cpp
     ${CMAKE_BINARY_DIR}/_deps/dss-src/dss/cli.cpp
 )
 
