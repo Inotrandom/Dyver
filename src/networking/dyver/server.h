@@ -20,7 +20,7 @@ public:
 		m_video = std::make_shared<iosock_t>();
 	}
 
-	~server_t() {}
+	~server_t() { kill(); }
 
 	void init()
 	{
