@@ -99,6 +99,8 @@ public:
 
 			std::cin.get();
 
+			NO_LOG = true;
+
 			/*
 			while (NO_LOG == false)
 			{
@@ -203,38 +205,7 @@ enum MSG_TYPE
  * @param type The type of the message (e.g. MSG_TYPE::WARN)
  * @param s The string message to output
  */
-inline void log(std::string s, MSG_TYPE type = MSG_TYPE::INFO)
-{
-	if (cli_t::NO_LOG == true)
-	{
-		return;
-	}
-
-	switch (type)
-	{
-	case (MSG_TYPE::WARN):
-	{
-		std::cout << "\033[93m[warning] ";
-		break;
-	}
-
-	case (MSG_TYPE::INFO):
-	{
-		std::cout << "\033[0m[info] ";
-		break;
-	}
-
-	case (MSG_TYPE::ERROR):
-	{
-		std::cout << "\033[91m[error] ";
-		break;
-	}
-	}
-
-	std::cout << s;
-
-	std::cout << "\033[0m\n" << std::flush;
-}
+void log(std::string s, MSG_TYPE type = MSG_TYPE::INFO);
 } // namespace utils
 
 #endif // DYVER_CLI_H
