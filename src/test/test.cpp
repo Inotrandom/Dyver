@@ -7,17 +7,11 @@
 
 #include "topside/core/amp_distribution.h"
 
-// #include "networking/networking_key.h"
-// #include "networking/socket_helper.h"
-
 #include "networking/iosock.h"
 #include "networking/networking_key.h"
 
 #include "networking/dyver/client.h"
 #include "networking/dyver/server.h"
-
-// #include "networking/dyver_client.h"
-// #include "networking/dyver_server.h"
 
 #include "DSS.h"
 
@@ -181,62 +175,6 @@ static const test_t TEST_ABSTRACT_ROV = test_t("test_abstract_rov", __LINE__,
 		return true;
 	});
 
-#if 0
-static bool TEST_SOCKET_HELPER_SUCCEEDED = true;
-static std::string TEST_SOCKET_HELPER_CURRENT = "";
-
-static void run_sockethelper_test_server()
-{
-	listen_socket_t server = listen_socket_t();
-
-	server.get_onrx()->connect(
-		[](const std::string s)
-		{
-			std::cout << "Recieved: " << s << std::endl;
-			if (TEST_SOCKET_HELPER_CURRENT != s)
-			{
-				TEST_SOCKET_HELPER_SUCCEEDED = false;
-			}
-		});
-
-	server.initialize(PORT_DSS);
-
-	server.accept_n(1);
-
-	std::this_thread::sleep_for(std::chrono::seconds(2));
-	server.kill();
-}
-
-static void run_sockethelper_test_client()
-{
-	send_socket_t client = send_socket_t();
-	client.connect_to(PORT_DSS, "127.0.0.1");
-	TEST_SOCKET_HELPER_CURRENT = "Check it out";
-	client.tx(TEST_SOCKET_HELPER_CURRENT.c_str());
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	TEST_SOCKET_HELPER_CURRENT = "I'm in the house";
-	client.tx(TEST_SOCKET_HELPER_CURRENT.c_str());
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	TEST_SOCKET_HELPER_CURRENT = "Like carpet";
-	client.tx(TEST_SOCKET_HELPER_CURRENT.c_str());
-
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-	client.kill();
-}
-
-static const test_t TEST_SOCKET_HELPER = test_t("test_socket_helper", __LINE__,
-	[]()
-	{
-		std::thread server_handle(run_sockethelper_test_server);
-		std::this_thread::yield();
-		std::thread client_handle(run_sockethelper_test_client);
-
-		server_handle.join();
-		client_handle.join();
-		return TEST_SOCKET_HELPER_SUCCEEDED;
-	});
-#endif
-
 static const test_t TEST_DELEGATE = test_t("test_delegate", __LINE__,
 	[]()
 	{
@@ -325,48 +263,6 @@ static const test_t TEST_CLIENT_SERVER = test_t("test_client_server", __LINE__,
 		return res;
 	});
 
-#if 0
-static void run_dyver_server_test()
-{
-	dyver_server_t server = dyver_server_t();
-	server.initialize("127.0.0.1");
-	std::this_thread::sleep_for(std::chrono::seconds(6));
-	server.verify_inet_connection();
-	std::this_thread::sleep_for(std::chrono::seconds(9));
-	server.kill();
-}
-
-static void run_dyver_client_test()
-{
-	dyver_client_t client = dyver_client_t();
-	client.initialize("127.0.0.1");
-	std::this_thread::sleep_for(std::chrono::seconds(15));
-	client.kill();
-}
-
-static const test_t TEST_CLIENT_SERVER = test_t("test_client_server", __LINE__,
-	[]()
-	{
-		utils::log("(test) Initializing Dyver Server");
-		std::thread server_handle(run_dyver_server_test);
-
-		server_handle.detach();
-
-		std::this_thread::sleep_for(std::chrono::seconds(5));
-
-		utils::log("(test) Initializing Dyver Client");
-		std::thread client_handle(run_dyver_client_test);
-
-		client_handle.join();
-
-		return true;
-	});
-#endif
-/*
-static const test_t TEST_DENSE_UTILS = test_t("", __LINE__, [](){
-	quat_from_euler(Eigen::Vector3d());
-});
-*/
 auto main() -> int
 {
 	std::cout << "Commencing Dyver Tests" << std::endl;
