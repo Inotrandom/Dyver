@@ -50,7 +50,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     dss
     GIT_REPOSITORY https://github.com/Inotrandom/deep-sea-shell.git
-    GIT_TAG master
+    GIT_TAG v1.x
     GIT_PROGRESS TRUE
     GIT_SHALLOW TRUE
     USES_TERMINAL_DOWNLOAD TRUE
