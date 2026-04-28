@@ -2,7 +2,6 @@
 #include "dss/DSS.h"
 
 #include <iostream>
-#include <thread>
 
 #include "networking/dyver/server.h"
 
@@ -11,7 +10,6 @@
 #include "app.h"
 #include "cli/cli.h"
 
-const std::string MAIN_CLI_NAME = "dyver-dss";
 void command_line(DSS::cli_t *p_cli) { p_cli->init(); }
 
 auto main(int argc, char **argv) -> int
@@ -49,7 +47,7 @@ auto main(int argc, char **argv) -> int
 	server_t server = server_t();
 
 	cli_t cli = cli_t();
-	cli.init();
+	cli.init(headless);
 
 	cli.get_on_input()->connect(
 		[&server](std::string got)

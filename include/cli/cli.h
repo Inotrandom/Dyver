@@ -23,11 +23,18 @@ public:
 	}
 	~cli_t() {}
 
-	void init()
+	void init(bool block = false)
 	{
 		clear();
 		m_thread = std::thread(&cli_t::input_loop, this);
-		m_thread.detach();
+
+		if (block == false)
+		{
+			m_thread.detach();
+			return;
+		}
+
+		m_thread.join();
 	}
 
 	void showcmdline()
@@ -67,6 +74,12 @@ public:
 			exit(EXIT_SUCCESS);
 		}
 
+		if (lower == "clear")
+		{
+			clear();
+			return;
+		}
+
 		if (lower == "cli-unblock")
 		{
 			NO_LOG = false;
@@ -88,6 +101,7 @@ public:
 				}
 			}
 				*/
+			return;
 		}
 	}
 
