@@ -2,6 +2,7 @@
 #define H_UTILS
 
 #include <cmath>
+#include <string>
 
 namespace utils
 {
@@ -107,6 +108,27 @@ struct linear_percentage_t
 		return m_min + pc.to_value(p);
 	}
 };
+
+auto from_yn(std::string s) -> bool
+{
+	if (s.find("yes") != std::string::npos)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+auto to_yn(bool v) -> std::string
+{
+	if (v == true)
+	{
+		return "yes";
+	}
+
+	return "no";
+}
+
 } // namespace utils
 
 #endif
