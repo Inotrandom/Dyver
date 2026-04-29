@@ -198,7 +198,7 @@ private:
 
 		connection_loop(their_address, i_logsig);
 
-		if (m_i_connected == false)
+		if (m_i_connected == true)
 		{
 			utils::log(i_logsig + " Connection success");
 		}
@@ -298,6 +298,8 @@ private:
 				kill();
 				return;
 			}
+
+			utils::log("(socket " + std::to_string(m_ofd) + ") Connection accepted");
 
 			open_client_handler(accepted);
 		}
