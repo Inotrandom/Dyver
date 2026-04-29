@@ -167,6 +167,12 @@ public:
 private:
 	void open_in(int iport, std::string i_inet_address)
 	{
+		// Don't open a new one if you don't have to
+		if (isfd_valid(m_ifd) == true)
+		{
+			return;
+		}
+
 		std::this_thread::yield();
 		m_ifd = socket(AF_INET, SOCK_STREAM, PROTOCOL_AUTO);
 
@@ -238,6 +244,12 @@ private:
 
 	void open_out(int oport, std::string o_inet_address)
 	{
+		// Don't open a new one if you don't have to
+		if (isfd_valid(m_ofd) == true)
+		{
+			return;
+		}
+
 		m_ofd = socket(AF_INET, SOCK_STREAM, PROTOCOL_AUTO);
 		std::string o_logsig = "(socket " + std::to_string(m_ofd) + ")";
 
