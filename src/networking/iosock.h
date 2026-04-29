@@ -104,9 +104,11 @@ public:
 	 * @param my_port Port of the "my" socket on this end.
 	 * @param their_port Port of the "their" socket on the other end.
 	 */
-	void init(
-		int my_port, int their_port, bool out = false, bool in = false, std::string send_to_address = "127.0.0.1", std::string recieve_from_address = "0.0.0.0")
+	void init(int my_port, int their_port, bool out = false, bool in = false, std::string send_to_address = "127.0.0.1",
+		std::string recieve_from_address = "0.0.0.0", bool extended_retry = false)
 	{
+		m_extended_retry = extended_retry;
+
 		if (in == out && send_to_address == recieve_from_address)
 		{
 			throw std::runtime_error("Cannot perform both I/O if the source and destination addresses are the same");
@@ -160,6 +162,8 @@ public:
 		close(m_ifd);
 	}
 
+	auto is_connected() -> bool { return (m_i_connected == true && m_accepted_o_connections > 0); }
+
 private:
 	void open_in(int iport, std::string i_inet_address)
 	{
@@ -182,16 +186,31 @@ private:
 
 		connection_loop(their_address, i_logsig);
 
-		utils::log(i_logsig + " Connection success");
+		if (m_i_connected == false)
+		{
+			utils::log(i_logsig + " Connection success");
+		}
 	}
 
-	// TODO: Improve this and expose it
+	// TODO: Improve this and expose it so a retry is easier
 	void connection_loop(sockaddr_in their_address, std::string i_logsig)
 	{
+		int max_retries = MAX_RETRIES;
+		if (m_extended_retry == true)
+		{
+			max_retries = MAX_RETRIES_EXTENDED;
+		}
+
 		int attempt = 0;
 		while (m_i_connected == false)
 		{
 			++attempt;
+
+			if (attempt > max_retries)
+			{
+				utils::log(i_logsig + " Connection timed out after " + std::to_string(max_retries) + " failed attempts.", utils::MSG_TYPE::ERROR);
+				return;
+			}
 
 			if (isfd_valid(m_ifd) == false)
 			{
@@ -210,15 +229,9 @@ private:
 			if (connect_res == INVALID)
 			{
 				utils::log(
-					i_logsig + " Failure to connect. Attempt " + std::to_string(attempt) + " out of " + std::to_string(MAX_RETRIES), utils::MSG_TYPE::WARN);
+					i_logsig + " Failure to connect. Attempt " + std::to_string(attempt) + " out of " + std::to_string(max_retries), utils::MSG_TYPE::WARN);
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 				continue;
-			}
-
-			if (attempt > MAX_RETRIES)
-			{
-				utils::log(i_logsig + " Connection timed out after " + std::to_string(MAX_RETRIES) + " failed attempts.", utils::MSG_TYPE::ERROR);
-				return;
 			}
 		}
 	}
@@ -283,6 +296,8 @@ private:
 	std::shared_ptr<onrx_delegate_t> m_onrx = nullptr;
 	int m_ofd = INVALID;
 	int m_ifd = INVALID;
+
+	bool m_extended_retry = false;
 
 	std::string m_o_inet_address = std::string();
 	std::string m_i_inet_address = std::string();
