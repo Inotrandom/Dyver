@@ -157,9 +157,12 @@ public:
 		{
 			c->kill();
 		}
+		m_client_handlers.clear();
 
 		close(m_ofd);
+		m_ofd = INVALID;
 		close(m_ifd);
+		m_ifd = INVALID;
 	}
 
 	auto is_connected() -> bool { return (m_i_connected == true && m_accepted_o_connections > 0); }
