@@ -62,6 +62,7 @@ public:
 	{
 		if (m_plaintext)
 		{
+			m_plaintext->get_onrx()->clear();
 			m_plaintext->kill();
 		}
 

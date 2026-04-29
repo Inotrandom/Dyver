@@ -289,7 +289,8 @@ private:
 			{
 				utils::log("(iosock_t::accept_handler) Failed to accept file descriptor", utils::MSG_TYPE::ERROR);
 				std::this_thread::sleep_for(std::chrono::seconds(1));
-				continue;
+				kill();
+				return;
 			}
 
 			open_client_handler(accepted);

@@ -33,6 +33,8 @@ public:
 		m_connected.erase(found);
 	}
 
+	void clear() { m_connected.clear(); }
+
 private:
 	std::vector<fn> m_connected;
 };

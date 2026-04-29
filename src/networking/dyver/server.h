@@ -41,6 +41,17 @@ public:
 		m_plaintext->init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, "127.0.0.6", "127.0.0.2");
 		m_video->init(PORT_VIDEO, PORT_VIDEO, false, true, "0.0.0.0", "127.0.0.2");
 #endif
+
+		std::function<void(std::string)> fn = [this](std::string msg)
+		{
+			if (msg == RESPONSE_PONG)
+			{
+				utils::log("(dyver server) Pong recieved!");
+				m_verified_signal = true;
+				return;
+			}
+		};
+		m_plaintext->get_onrx()->connect(fn);
 	}
 
 	bool verify_connection()
@@ -50,23 +61,13 @@ public:
 			return false;
 		}
 
-		bool res = false;
+		m_verified_signal = false;
 		utils::log("(dyver server) Ping...");
 
-		std::function<void(std::string)> fn = [&res](std::string msg)
-		{
-			if (msg == RESPONSE_PONG)
-			{
-				utils::log("(dyver server) Pong recieved!");
-				res = true;
-				return;
-			}
-		};
-		m_plaintext->get_onrx()->connect(fn);
 		*m_plaintext << COMMAND_PING;
 
 		// TODO: Prevent from yielding forever
-		while (res == false)
+		while (m_verified_signal == false)
 		{
 			std::this_thread::yield();
 		}
@@ -78,16 +79,20 @@ public:
 	{
 		if (m_plaintext)
 		{
+			m_plaintext->get_onrx()->clear();
 			m_plaintext->kill();
 		}
 
 		if (m_video)
 		{
+			m_video->get_onrx()->clear();
 			m_video->kill();
 		}
 	}
 
 private:
+	bool m_verified_signal = false;
+
 	std::shared_ptr<iosock_t> m_plaintext;
 	std::shared_ptr<iosock_t> m_video;
 };
