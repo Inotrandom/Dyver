@@ -46,7 +46,7 @@ auto main(int argc, char **argv) -> int
 
 	server_t server = server_t();
 
-	cli_t cli = cli_t();
+	cli_t cli = cli_t("Dyver Tospide CLI");
 	cli.init(headless);
 
 	cli.get_on_input()->connect(

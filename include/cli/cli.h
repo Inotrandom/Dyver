@@ -17,8 +17,9 @@ class cli_t
 public:
 	static bool NO_LOG;
 
-	explicit cli_t()
+	explicit cli_t(std::string name)
 	{
+		m_name = name;
 		NO_LOG = true;
 		m_oninput = std::make_shared<oninput_delegate_t>();
 	}
@@ -40,8 +41,7 @@ public:
 
 	void showcmdline()
 	{
-		std::cout << "\033[32m" << std::filesystem::current_path().generic_string() << "\033[0m\033[34m Dyver Topside CLI \033[0m \033[1m->\033[0m"
-				  << std::flush;
+		std::cout << "\033[32m" << std::filesystem::current_path().generic_string() << "\033[0m\033[34m " << m_name << "\033[0m \033[1m->\033[0m" << std::flush;
 	}
 
 	void input_loop()
@@ -184,6 +184,7 @@ public:
 
 private:
 	std::thread m_thread;
+	std::string m_name;
 	bool m_alive = true;
 
 	void esc() { std::cout << "\033["; }
