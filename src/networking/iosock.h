@@ -163,6 +163,9 @@ public:
 		m_ofd = INVALID;
 		close(m_ifd);
 		m_ifd = INVALID;
+
+		m_accepted_o_connections = 0;
+		m_i_connected = false;
 	}
 
 	auto is_connected() -> bool { return (m_i_connected == true && m_accepted_o_connections > 0); }
