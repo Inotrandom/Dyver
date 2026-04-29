@@ -153,19 +153,27 @@ public:
 
 	void kill()
 	{
+		if (m_ofd == INVALID && m_ifd == INVALID && m_client_handlers.empty())
+		{
+			return;
+		}
+
 		for (auto c : m_client_handlers)
 		{
 			c->kill();
 		}
 		m_client_handlers.clear();
 
+		shutdown(m_ofd, SHUT_RD);
 		close(m_ofd);
 		m_ofd = INVALID;
+		shutdown(m_ifd, SHUT_WR);
 		close(m_ifd);
 		m_ifd = INVALID;
 
 		m_accepted_o_connections = 0;
 		m_i_connected = false;
+		utils::log("(iosock_t::kill) Iosock kill completed");
 	}
 
 	auto is_connected() -> bool { return (m_i_connected == true && m_accepted_o_connections > 0); }
@@ -269,6 +277,13 @@ private:
 		m_my_address.sin_port = htons(oport);
 		m_my_address.sin_addr.s_addr = inet_addr(o_inet_address.c_str());
 
+		int reuseaddr_val = 1;
+		if (setsockopt(m_ofd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr_val, sizeof(int)) < 0)
+		{
+			utils::log(o_logsig + " Failure to configure socket options", utils::MSG_TYPE::ERROR);
+			return;
+		}
+
 		utils::log(o_logsig + " Attempting to bind to port " + std::to_string(oport) + ", only listening to connections from " + o_inet_address);
 
 		int bind_res = bind(m_ofd, (const struct sockaddr *)&m_my_address, sizeof(m_my_address));
@@ -293,9 +308,9 @@ private:
 			int accepted = accept(m_ofd, nullptr, nullptr);
 			if (accepted == INVALID)
 			{
-				utils::log("(iosock_t::accept_handler) Failed to accept file descriptor", utils::MSG_TYPE::ERROR);
+				// Likely due to being terminated
+				// utils::log("(socket " + std::to_string(m_ofd) + ") Failed to accept file descriptor", utils::MSG_TYPE::ERROR);
 				std::this_thread::sleep_for(std::chrono::seconds(1));
-				kill();
 				return;
 			}
 
