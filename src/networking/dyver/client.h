@@ -11,6 +11,7 @@
 #include "networking/iosock.h"
 #include "cache/cache_manager.h"
 #include "cli/cli.h"
+#include "utils.h"
 
 class client_t
 {
@@ -25,14 +26,19 @@ public:
 
 	void init()
 	{
-#ifndef FLAG_DYVER_TEST
-		cache_manager_t cache = cache_manager_t("server");
-		cache.load_cache();
-		std::string send_address = cache.read_buf_or("send_to_address", "0.0.0.0");
-		std::string recv_address = cache.read_buf_or("recieve_from_address", "0.0.0.0");
+		utils::log("(dyver client) Beginning initialization...");
 
-		m_plaintext->init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, send_address, recv_address);
-		m_video->init(PORT_VIDEO, PORT_VIDEO, true, false, send_address, recv_address);
+#ifndef FLAG_DYVER_TEST
+		cache_manager_t client_cache = cache_manager_t("client");
+		client_cache.load_cache();
+		std::string send_address = client_cache.read_buf_or("send_to_address", "0.0.0.0");
+		std::string recv_address = client_cache.read_buf_or("recieve_from_address", "0.0.0.0");
+
+		cache_manager_t robot_cache = cache_manager_t("robot");
+		bool is_daemon = utils::from_yn(client_cache.read_buf_or("is_daemon", "no"));
+
+		m_plaintext->init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, send_address, recv_address, is_daemon);
+		m_video->init(PORT_VIDEO, PORT_VIDEO, true, false, send_address, recv_address, is_daemon);
 #endif
 #ifdef FLAG_DYVER_TEST
 		utils::log("(dyver client) NETWORKING TEST ENABLED");

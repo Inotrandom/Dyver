@@ -26,6 +26,7 @@ public:
 
 	void init()
 	{
+		utils::log("(dyver server) Beginning initialization...");
 #ifndef FLAG_DYVER_TEST
 		cache_manager_t cache = cache_manager_t("server");
 		cache.load_cache();

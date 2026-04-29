@@ -109,7 +109,7 @@ struct linear_percentage_t
 	}
 };
 
-auto from_yn(std::string s) -> bool
+inline auto from_yn(std::string s) -> bool
 {
 	if (s.find("yes") != std::string::npos)
 	{
@@ -119,7 +119,7 @@ auto from_yn(std::string s) -> bool
 	return false;
 }
 
-auto to_yn(bool v) -> std::string
+inline auto to_yn(bool v) -> std::string
 {
 	if (v == true)
 	{

@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(
     ${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/robot/robot.cpp
+    ${CMAKE_SOURCE_DIR}/include/cli/cli.cpp
 )
 
 message(${wiringpi_SOURCE_DIR}/wiringPi)

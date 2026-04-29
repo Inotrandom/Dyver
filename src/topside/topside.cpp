@@ -61,6 +61,11 @@ auto main(int argc, char **argv) -> int
 			{
 				server.init();
 			}
+
+			if (got == "server-kill")
+			{
+				server.kill();
+			}
 		});
 
 	if (headless == false)
