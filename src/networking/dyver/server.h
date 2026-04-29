@@ -30,8 +30,8 @@ public:
 #ifndef FLAG_DYVER_TEST
 		cache_manager_t cache = cache_manager_t("server");
 		cache.load_cache();
-		std::string send_address = cache.read_buf_or("send_to_address", "0.0.0.0");
-		std::string recv_address = cache.read_buf_or("recieve_from_address", "0.0.0.0");
+		std::string send_address = cache.read_buf_or("their_address", "0.0.0.0");
+		std::string recv_address = cache.read_buf_or("my_address", "0.0.0.0");
 
 		m_plaintext->init(PORT_PLAINTEXT, PORT_PLAINTEXT, true, true, send_address, recv_address);
 		m_video->init(PORT_VIDEO, PORT_VIDEO, false, true, send_address, recv_address);

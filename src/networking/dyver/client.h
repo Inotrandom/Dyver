@@ -31,8 +31,8 @@ public:
 #ifndef FLAG_DYVER_TEST
 		cache_manager_t client_cache = cache_manager_t("client");
 		client_cache.load_cache();
-		std::string send_address = client_cache.read_buf_or("send_to_address", "0.0.0.0");
-		std::string recv_address = client_cache.read_buf_or("recieve_from_address", "0.0.0.0");
+		std::string send_address = client_cache.read_buf_or("their_address", "0.0.0.0");
+		std::string recv_address = client_cache.read_buf_or("my_address", "0.0.0.0");
 
 		cache_manager_t robot_cache = cache_manager_t("robot");
 		bool is_daemon = utils::from_yn(client_cache.read_buf_or("is_daemon", "no"));
