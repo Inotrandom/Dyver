@@ -1,0 +1,6 @@
+#ifndef FILE_CONSTANTS_H
+#define FILE_CONSTANTS_H
+
+#define INVALID -1
+
+#endif // FILE_CONSTANTS_H

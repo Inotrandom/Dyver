@@ -11,7 +11,6 @@
 #define RESPONSE_PONG "PONG"
 
 #define PROTOCOL_AUTO 0
-#define INVALID -1
 
 #define MAX_CONNECTIONS 32
 #define MSG_SIZE 1024

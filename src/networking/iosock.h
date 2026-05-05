@@ -18,6 +18,7 @@
 #include "cli/cli.h"
 
 #include "networking_key.h"
+#include "fileconstants.h"
 
 typedef delegate_t<std::function<void(const std::string)>> onrx_delegate_t;
 

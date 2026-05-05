@@ -13,20 +13,41 @@
 #include "cache/cache_manager.h"
 #include "cli/cli.h"
 #include "networking/dyver/client.h"
-#include "wiringPi.h"
 #include "utils.h"
+
+#define ROBOT_TARGET_LINUX
+
+#ifdef ROBOT_TARGET_LINUX
+#ifndef linux
+#warning "Compiling for Linux on a non-linux machine."
+#endif
+#include "robot/driver/linux/i2c_device.h"
+#endif
+
+struct robot_options_t
+{
+	bool daemon = false;
+	bool tests = false;
+};
+
+void hardware_tests() {}
 
 auto main(int argc, char **argv) -> int
 {
 	(void)argv;
 	(void)argc;
 
-	bool daemon = false;
+	robot_options_t opt = robot_options_t();
 	if (argc > 1)
 	{
 		if (strcmp(argv[1], "--daemon") == 0)
 		{
-			daemon = true;
+			opt.daemon = true;
+		}
+
+		if (strcmp(argv[1], "-t") == 0)
+		{
+			opt.tests = true;
 		}
 	}
 
@@ -34,10 +55,10 @@ auto main(int argc, char **argv) -> int
 	cache_manager_t robot_cache = cache_manager_t("robot");
 
 	robot_cache.load_cache();
-	robot_cache.write_buf("is_daemon", utils::to_yn(daemon));
+	robot_cache.write_buf("is_daemon", utils::to_yn(opt.daemon));
 	robot_cache.rebuild_cache();
 
-	if (daemon == false)
+	if (opt.daemon == false)
 	{
 		cli_t cli = cli_t("Dyver Client CLI");
 
