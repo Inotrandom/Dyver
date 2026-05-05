@@ -18,6 +18,8 @@
 #define I2C_TARGET I2C_SLAVE
 #define I2C_CONTROLLER I2C_MASTER
 
+// Thanks https://emlogic.no/2025/06/accessing-i2c-devices-from-userspace-in-linux/
+
 class i2c_device_t
 {
 public:
