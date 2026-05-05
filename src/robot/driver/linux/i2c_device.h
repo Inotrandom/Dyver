@@ -20,6 +20,9 @@
 
 // Thanks https://emlogic.no/2025/06/accessing-i2c-devices-from-userspace-in-linux/
 
+// Probably overkill
+#define MAX_WRITE_SIZE 1024
+
 class i2c_device_t
 {
 public:
@@ -42,10 +45,77 @@ public:
 		}
 	}
 
+	auto is_init() -> bool { return (m_device_fd != INVALID); }
+
+	void reg(uint8_t r)
+	{
+		m_input_len = 1;
+		m_input_buf[0] = r;
+	}
+
+	auto write_to_buf(uint8_t b) -> int
+	{
+		if (++m_input_len > MAX_WRITE_SIZE)
+		{
+			return -1;
+		}
+
+		m_input_buf[m_input_len] = b;
+		return 0;
+	}
+
+	auto read_to_buf(std::size_t nb) -> int
+	{
+		if (is_init() == false)
+		{
+			return -1;
+		}
+
+		if (nb > MAX_WRITE_SIZE)
+		{
+			return -1;
+		}
+
+		if (nb <= 0)
+		{
+			return -1;
+		}
+
+		read(m_device_fd, m_output_buf, nb);
+
+		return 0;
+	}
+
+	// Size is MAX_WRITE_SIZE
+	auto get_output_buf() -> std::uint8_t * { return m_output_buf; }
+
+	int flush_out()
+	{
+		if (is_init() == false)
+		{
+			return -1;
+		}
+
+		return write(m_device_fd, m_input_buf, m_input_len);
+	}
+
+	void kill()
+	{
+		if (is_init() == false)
+		{
+			return;
+		}
+
+		close(m_device_fd);
+	}
+
 private:
+	// TODO: C++-ify some of this garbage
+
+	std::uint8_t m_input_buf[MAX_WRITE_SIZE];
+	std::size_t m_input_len = 0;
+	std::uint8_t m_output_buf[MAX_WRITE_SIZE];
 	int m_device_fd = INVALID;
-	std::vector<uint8_t> m_input_buf;
-	std::vector<uint8_t> m_output_buf;
 };
 
 #endif // I2C_DEVICE_H
