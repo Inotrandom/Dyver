@@ -17,13 +17,6 @@
 
 #define ROBOT_TARGET_LINUX
 
-#ifdef ROBOT_TARGET_LINUX
-#ifndef linux
-#warning "Compiling for Linux on a non-linux machine."
-#endif
-#include "robot/driver/linux/i2c_device.h"
-#endif
-
 struct robot_options_t
 {
 	bool daemon = false;

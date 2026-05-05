@@ -9,16 +9,16 @@
 enum class DRIVER_TYPE : std::uint8_t
 {
 	/**
-	 * @brief Sensors and anything that doesn't require a write interface to control systems
+	 * @brief Sensors and anything that doesn't require significant control
 	 *
 	 */
-	READ,
+	SENSOR,
 
 	/**
 	 * @brief Thrusters, servos, and anything that doesn't provide useful data back
 	 *
 	 */
-	WRITE,
+	ACTUATOR,
 
 	/**
 	 * @brief Companions and any component that accepts both control inputs as well as provides useful data
@@ -48,8 +48,10 @@ enum class DRIVER_SIGNATURE : std::uint8_t
 
 enum class DRIVER_CONNECTION_STATUS : std::uint8_t
 {
-	FAILED,
-	SUCCEEDED
+	UNKNOWN,
+	PARTIAL,
+	CONNECTED,
+	DISCONNECTED,
 };
 
 namespace common_data_headers
@@ -60,9 +62,9 @@ const std::string LINEAR_ACCELERATION3_ms2 = "linear_acceleration3_m/s^2";
 const std::string ANGULAR_ACCELERATION3_rads2 = "angular_acceleration3_rad/s^2";
 const std::string MAGNETOMETER_T = "magnetometer_T";
 
-// Common ESC Values
+// Control
 
-const std::string PWM_us = "pwm_us";
+const std::string THROTTLE = "throttle";
 
 // Generic component values
 
@@ -113,8 +115,14 @@ public:
 	 */
 	virtual void stop() = 0;
 
+	auto get_type() -> DRIVER_TYPE & { return m_type; }
+	auto get_signature() -> DRIVER_SIGNATURE & { return m_signature; }
+	auto get_connection_status() -> DRIVER_CONNECTION_STATUS & { return m_connection_status; }
+
 private:
 	DRIVER_TYPE m_type;
+	DRIVER_SIGNATURE m_signature;
+	DRIVER_CONNECTION_STATUS m_connection_status;
 };
 
 #endif // H_ABSTRACT_DRIVER
