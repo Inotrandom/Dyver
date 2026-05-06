@@ -13,9 +13,12 @@
 #include "cache/cache_manager.h"
 #include "cli/cli.h"
 #include "networking/dyver/client.h"
+#include "robot/driver/abstract_driver.h"
 #include "utils.h"
 
 #define ROBOT_TARGET_LINUX
+
+#include "robot/driver/imu/ISM330DHCX-MMC5983MA.h"
 
 struct robot_options_t
 {
@@ -23,7 +26,19 @@ struct robot_options_t
 	bool tests = false;
 };
 
-void hardware_tests() {}
+void hardware_tests()
+{
+	std::shared_ptr<ISM330DHCX_MMC5983MA_t> imu = std::make_shared<ISM330DHCX_MMC5983MA_t>();
+	for (;;)
+	{
+		driver_packet_t pack = imu->read();
+		if (pack.empty())
+		{
+			utils::log("Empty data packet.", utils::MSG_TYPE::WARN);
+		}
+		utils::log(std::any_cast<std::string>(pack[common_data_headers::TEMPERATURE_C]));
+	}
+}
 
 auto main(int argc, char **argv) -> int
 {
@@ -50,6 +65,11 @@ auto main(int argc, char **argv) -> int
 	robot_cache.load_cache();
 	robot_cache.write_buf("is_daemon", utils::to_yn(opt.daemon));
 	robot_cache.rebuild_cache();
+
+	if (opt.tests == true)
+	{
+		hardware_tests();
+	}
 
 	if (opt.daemon == false)
 	{

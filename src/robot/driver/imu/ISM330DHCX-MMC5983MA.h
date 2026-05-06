@@ -2,12 +2,22 @@
 #define ISM330DHCX_MMC5983MA_H
 
 #include <memory>
+#include <sstream>
+
+#include "cache/cache_manager.h"
 
 #include "robot/driver/abstract_driver.h"
+#include "utils.h"
 
 #ifdef linux
 #include "robot/driver/linux/i2c_device.h"
 #endif
+
+#include <Eigen/Dense>
+
+#define DEFAULT_BUS "1"
+#define ADDR_DEFAULT_ISM330DHCX 0x6b
+#define ADDR_DEFAULT_MMC5983MA 0x30
 
 #define REG_FUNC_CFG_ACCESS 0x01
 #define REG_PIN_CTRL 0x02
@@ -36,6 +46,7 @@
 #define REG_D6D_SRC 0x1d
 #define REG_STATUS_REG 0x1e
 
+// Output registers
 #define REG_OUT_TEMP_L 0x20
 #define REG_OUT_TEMP_H 0x21
 #define REG_OUTX_L_G 0x22
@@ -94,13 +105,69 @@
 class ISM330DHCX_MMC5983MA_t : abstract_driver_t
 {
 public:
-	auto read() -> driver_packet_t override {}
+	explicit ISM330DHCX_MMC5983MA_t() {}
+	~ISM330DHCX_MMC5983MA_t() {}
+
+	auto read() -> driver_packet_t override
+	{
+		if (m_ism330dhcx->is_init() == false)
+		{
+			return driver_packet_t();
+		}
+
+		m_ism330dhcx->reg(REG_OUT_TEMP_L);
+		if (m_ism330dhcx->read_to_buf(1) == INVALID)
+		{
+			return driver_packet_t();
+		}
+
+		std::uint8_t b1 = m_ism330dhcx->get_output_buf()[0];
+
+		m_ism330dhcx->reg(REG_OUT_TEMP_H);
+		if (m_ism330dhcx->read_to_buf(1) == INVALID)
+		{
+			return driver_packet_t();
+		};
+
+		std::uint8_t b2 = m_ism330dhcx->get_output_buf()[0];
+
+		double temp = utils::tc_tw(b1, b2) / 256.0;
+
+		driver_packet_t res = driver_packet_t();
+		res[common_data_headers::LINEAR_ACCELERATION3_ms2] = Eigen::Vector3d(0.0, 0.0, 0.0);
+		res[common_data_headers::ANGULAR_ACCELERATION3_rads2] = Eigen::Vector3d(0.0, 0.0, 0.0);
+		res[common_data_headers::TEMPERATURE_C] = temp;
+		res[common_data_headers::MAGNETOMETER_T] = 0.0;
+
+		return res;
+	}
 
 	void write(driver_packet_t what) override { (void)what; }
 
-	auto start(driver_packet_t args) -> DRIVER_CONNECTION_STATUS override {}
+	auto start(driver_packet_t args) -> DRIVER_CONNECTION_STATUS override
+	{
+		(void)args;
 
-	void stop() override {}
+		cache_manager_t cache_manager = cache_manager_t("ism330dhcx");
+		cache_manager.load_cache();
+		std::string override_address = cache_manager.read_buf_or("override_address", std::to_string(ADDR_DEFAULT_ISM330DHCX));
+		std::string bus = cache_manager.read_buf_or("bus", DEFAULT_BUS);
+		cache_manager.rebuild_cache();
+		std::stringstream s;
+		std::int32_t res = 0;
+		s << override_address;
+		s >> res;
+
+		m_ism330dhcx->init(bus, res);
+		if (m_ism330dhcx->is_init() == false)
+		{
+			return DRIVER_CONNECTION_STATUS::UNKNOWN;
+		}
+
+		return DRIVER_CONNECTION_STATUS::CONNECTED;
+	}
+
+	void stop() override { m_ism330dhcx->kill(); }
 
 private:
 	std::shared_ptr<i2c_device_t> m_ism330dhcx = std::make_shared<i2c_device_t>();

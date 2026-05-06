@@ -119,6 +119,8 @@ public:
 			return read_buf(k);
 		}
 
+		write_buf(k, def);
+
 		return def;
 	}
 

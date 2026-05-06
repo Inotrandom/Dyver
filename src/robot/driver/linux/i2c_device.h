@@ -81,9 +81,7 @@ public:
 			return -1;
 		}
 
-		read(m_device_fd, m_output_buf, nb);
-
-		return 0;
+		return read(m_device_fd, m_output_buf, nb);
 	}
 
 	// Size is MAX_WRITE_SIZE

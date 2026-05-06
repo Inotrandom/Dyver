@@ -71,6 +71,8 @@ const std::string THROTTLE = "throttle";
 const std::string PIN = "gpio_pin";
 const std::string TEMPERATURE_C = "temp_C";
 
+const std::string BUS = "i2c_bus";
+
 } // namespace common_data_headers
 
 typedef std::map<std::string, std::any> driver_packet_t;
@@ -78,6 +80,8 @@ typedef std::map<std::string, std::any> driver_packet_t;
 class abstract_driver_t
 {
 public:
+	explicit abstract_driver_t() {}
+
 	explicit abstract_driver_t(DRIVER_TYPE type) { m_type = type; }
 
 	~abstract_driver_t();
