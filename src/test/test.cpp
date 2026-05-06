@@ -320,7 +320,9 @@ static const test_t TEST_UTILS = test_t("test_utils", __LINE__,
 		b1 = 0b11111110;
 		b2 = 0b11111111;
 
-		if (utils::tc_tw(b1, b2) != -0b0000000000000000)
+		// 1111111111111110
+
+		if (utils::tc_tw(b1, b2) != -0b0000000000000010)
 		{
 			return false;
 		}
