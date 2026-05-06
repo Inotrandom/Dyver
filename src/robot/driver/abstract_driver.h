@@ -84,7 +84,7 @@ public:
 
 	explicit abstract_driver_t(DRIVER_TYPE type) { m_type = type; }
 
-	~abstract_driver_t();
+	~abstract_driver_t() {};
 
 	// Mess-prevention
 	abstract_driver_t(const abstract_driver_t &) = delete;
