@@ -292,6 +292,42 @@ static const test_t TEST_CACHE_MANAGER = test_t("test_cache_manager", __LINE__,
 		return true;
 	});
 
+static const test_t TEST_UTILS = test_t("test_utils", __LINE__,
+	[]()
+	{
+		std::uint8_t b1 = 0b00000000;
+		std::uint8_t b2 = 0b00000000;
+
+		// 0000000000000000
+		// 0
+
+		if (utils::tc_tw(b1, b2) != 0b0000000000000000)
+		{
+			return false;
+		}
+
+		b1 = 0b11111111;
+		b2 = 0b11111111;
+
+		// 1111111111111111
+		// -1
+
+		if (utils::tc_tw(b1, b2) != -0b0000000000000001)
+		{
+			return false;
+		}
+
+		b1 = 0b11111110;
+		b2 = 0b11111111;
+
+		if (utils::tc_tw(b1, b2) != -0b0000000000000000)
+		{
+			return false;
+		}
+
+		return true;
+	});
+
 auto main() -> int
 {
 	std::cout << "Commencing Dyver Tests" << std::endl;
@@ -309,6 +345,7 @@ auto main() -> int
 	TEST_IOSOCK.run(&passed_tests, &failed_tests);
 	TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
 	TEST_CACHE_MANAGER.run(&passed_tests, &failed_tests);
+	TEST_UTILS.run(&passed_tests, &failed_tests);
 
 	std::cout << passed_tests << " tests passed" << std::endl;
 	std::cout << failed_tests << " tests failed" << std::endl;

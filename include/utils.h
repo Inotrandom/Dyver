@@ -1,8 +1,10 @@
 #ifndef H_UTILS
 #define H_UTILS
 
+#include <cstdint>
 #include <cmath>
 #include <string>
+#include <bitset>
 
 namespace utils
 {
@@ -127,6 +129,36 @@ inline auto to_yn(bool v) -> std::string
 	}
 
 	return "no";
+}
+
+/**
+ * @brief Two's complement two words
+ *
+ * @param b1 Word 1
+ * @param b2 Word 2
+ * @return std::int16_t Resulting number
+ */
+inline auto tc_tw(std::uint8_t b1, std::uint8_t b2) -> std::int16_t
+{
+	std::bitset<8> bs1 = std::bitset<8>(b1);
+	std::bitset<8> bs2 = std::bitset<8>(b2);
+
+	// Um... at least it works..
+	std::bitset<16> resbs = std::bitset<16>(bs2.to_string() + bs1.to_string());
+
+	if (resbs.any() == false)
+	{
+		return 0;
+	}
+
+	if (resbs[0] == 0)
+	{
+		return (std::int16_t)resbs.to_ulong();
+	}
+
+	resbs.flip();
+
+	return -((std::int16_t)resbs.to_ulong() + 1);
 }
 
 } // namespace utils
