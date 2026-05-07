@@ -29,7 +29,7 @@ struct robot_options_t
 void hardware_tests()
 {
 	std::shared_ptr<ISM330DHCX_MMC5983MA_t> imu = std::make_shared<ISM330DHCX_MMC5983MA_t>();
-	
+
 	imu->start(driver_packet_t());
 
 	for (;;)

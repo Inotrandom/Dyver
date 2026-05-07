@@ -47,9 +47,9 @@
 #define REG_D6D_SRC 0x1d
 
 #define REG_STATUS_REG 0x1e
-#define BIT_STATUS_REG_TDA 0x6
-#define BIT_STATUS_REG_GDA 0x7
-#define BIT_STATUS_REG_XLDA 0x8
+#define BIT_STATUS_REG_TDA 0x3
+#define BIT_STATUS_REG_GDA 0x2
+#define BIT_STATUS_REG_XLDA 0x1
 
 // Output registers
 #define REG_OUT_TEMP_L 0x20
@@ -111,7 +111,11 @@ class ISM330DHCX_MMC5983MA_t : abstract_driver_t
 {
 public:
 	explicit ISM330DHCX_MMC5983MA_t() {}
-	~ISM330DHCX_MMC5983MA_t() {}
+	~ISM330DHCX_MMC5983MA_t()
+	{
+		m_ism330dhcx->kill();
+		m_mmc5983ma->kill();
+	}
 
 	auto read() -> driver_packet_t override
 	{
@@ -120,19 +124,39 @@ public:
 			return driver_packet_t();
 		}
 
-		m_ism330dhcx->reg(REG_STATUS_REG);
+		m_ism330dhcx->reg(REG_WHO_AM_I);
+		m_ism330dhcx->flush_out();
+
 		if (m_ism330dhcx->read_to_buf(1) == INVALID)
 		{
 			return driver_packet_t();
 		}
 
+		if (m_ism330dhcx->get_output_buf()[0] != 0x6b)
+		{
+			utils::log("whoami failed. Value is " + std::to_string(m_ism330dhcx->get_output_buf()[0]), utils::MSG_TYPE::ERROR);
+			return driver_packet_t();
+		}
+
+		m_ism330dhcx->reg(REG_STATUS_REG);
+		m_ism330dhcx->flush_out();
+		if (m_ism330dhcx->read_to_buf(1) == INVALID)
+		{
+			utils::log("unable to read status register.", utils::MSG_TYPE::WARN);
+			return driver_packet_t();
+		}
+
 		std::bitset<8> status = std::bitset<8>(m_ism330dhcx->get_output_buf()[0]);
+		//utils::log(status.to_string());
 		if (status[BIT_STATUS_REG_TDA] == 0)
 		{
 			return driver_packet_t();
 		}
 
+		//utils::log("Temperature bit set to 1");
+
 		m_ism330dhcx->reg(REG_OUT_TEMP_L);
+		m_ism330dhcx->flush_out();
 		if (m_ism330dhcx->read_to_buf(1) == INVALID)
 		{
 			return driver_packet_t();
@@ -141,12 +165,16 @@ public:
 		std::uint8_t b1 = m_ism330dhcx->get_output_buf()[0];
 
 		m_ism330dhcx->reg(REG_OUT_TEMP_H);
+		m_ism330dhcx->flush_out();
 		if (m_ism330dhcx->read_to_buf(1) == INVALID)
 		{
 			return driver_packet_t();
 		};
 
 		std::uint8_t b2 = m_ism330dhcx->get_output_buf()[0];
+
+		utils::log("byte1: " + std::to_string(b1));
+		utils::log("byte2: " + std::to_string(b2));
 
 		double temp = utils::tc_tw(b1, b2) / 256.0;
 
