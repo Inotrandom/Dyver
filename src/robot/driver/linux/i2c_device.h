@@ -43,6 +43,8 @@ public:
 			utils::log("(i2c_device_t) Failure to communicate with bus. (" + i2c_bus_file + ")", utils::MSG_TYPE::ERROR);
 			return;
 		}
+
+		utils::log("(i2c_device_t) Communication with bus opened.");
 	}
 
 	auto is_init() -> bool { return (m_device_fd != INVALID); }

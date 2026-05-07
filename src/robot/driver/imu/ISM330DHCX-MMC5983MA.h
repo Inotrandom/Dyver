@@ -1,6 +1,7 @@
 #ifndef ISM330DHCX_MMC5983MA_H
 #define ISM330DHCX_MMC5983MA_H
 
+#include <bitset>
 #include <memory>
 #include <sstream>
 
@@ -44,7 +45,11 @@
 #define REG_WAKE_UP_SRC 0x1b
 #define REG_TAP_SRC 0x1c
 #define REG_D6D_SRC 0x1d
+
 #define REG_STATUS_REG 0x1e
+#define BIT_STATUS_REG_TDA 0x6
+#define BIT_STATUS_REG_GDA 0x7
+#define BIT_STATUS_REG_XLDA 0x8
 
 // Output registers
 #define REG_OUT_TEMP_L 0x20
@@ -111,6 +116,18 @@ public:
 	auto read() -> driver_packet_t override
 	{
 		if (m_ism330dhcx->is_init() == false)
+		{
+			return driver_packet_t();
+		}
+
+		m_ism330dhcx->reg(REG_STATUS_REG);
+		if (m_ism330dhcx->read_to_buf(1) == INVALID)
+		{
+			return driver_packet_t();
+		}
+
+		std::bitset<8> status = std::bitset<8>(m_ism330dhcx->get_output_buf()[0]);
+		if (status[BIT_STATUS_REG_TDA] == 0)
 		{
 			return driver_packet_t();
 		}
