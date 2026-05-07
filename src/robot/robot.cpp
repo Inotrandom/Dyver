@@ -29,14 +29,17 @@ struct robot_options_t
 void hardware_tests()
 {
 	std::shared_ptr<ISM330DHCX_MMC5983MA_t> imu = std::make_shared<ISM330DHCX_MMC5983MA_t>();
+	
+	imu->start(driver_packet_t());
+
 	for (;;)
 	{
 		driver_packet_t pack = imu->read();
 		if (pack.empty())
 		{
-			utils::log("Empty data packet.", utils::MSG_TYPE::WARN);
+			continue;
 		}
-		utils::log(std::any_cast<std::string>(pack[common_data_headers::TEMPERATURE_C]));
+		utils::log(std::to_string(std::any_cast<double>(pack[common_data_headers::TEMPERATURE_C])));
 	}
 }
 

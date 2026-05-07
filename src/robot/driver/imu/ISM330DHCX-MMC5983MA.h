@@ -16,7 +16,7 @@
 
 #include <Eigen/Dense>
 
-#define DEFAULT_BUS "1"
+#define DEFAULT_BUS "/dev/i2c-1"
 #define ADDR_DEFAULT_ISM330DHCX 0x6b
 #define ADDR_DEFAULT_MMC5983MA 0x30
 
