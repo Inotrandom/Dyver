@@ -39,7 +39,7 @@ void hardware_tests()
 		{
 			continue;
 		}
-		utils::log(std::any_cast<std::string>(pack[common_data_headers::TEMPERATURE_C]));
+		utils::log(std::to_string(std::any_cast<double>(pack[common_data_headers::TEMPERATURE_C])));
 	}
 }
 
