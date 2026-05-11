@@ -87,10 +87,12 @@ void thruster_tests()
 
 	utils::log("Check for initialization.");
 	gpioServo(p, 1500);
+	time_sleep(1.5);
 	user_acknowledge();
 
 	utils::log("Check for running.");
 	gpioServo(p, 1550);
+	time_sleep(1);
 	user_acknowledge();
 
 	utils::log("Check for stopping.");
