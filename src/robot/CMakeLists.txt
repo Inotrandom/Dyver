@@ -19,4 +19,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${wiringpi_SOURCE_DIR}/wiringPi
     ${eigen_SOURCE_DIR}
+    ${pigpio_SOURCE_DIR}
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE pigpio)

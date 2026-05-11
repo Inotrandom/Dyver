@@ -57,15 +57,15 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-    wiringpi
-    GIT_REPOSITORY https://github.com/WiringPi/WiringPi
+    pigpio
+    GIT_REPOSITORY https://github.com/joan2937/pigpio
     GIT_TAG master
     GIT_PROGRESS TRUE
     GIT_SHALLOW TRUE
     USES_TERMINAL_DOWNLOAD TRUE
 )
 
-FetchContent_MakeAvailable(wiringpi)
+FetchContent_MakeAvailable(pigpio)
 
 set(SDLTTF_VENDORED ON)
 FetchContent_MakeAvailable(sdl sdl_ttf)
@@ -94,6 +94,7 @@ target_include_directories(
     ${sdl_SOURCE_DIR}/include
     ${matplotplusplus_SOURCE_DIR}/source
     ${sdl_ttf_SOURCE_DIR}/include
+    ${pigpio_SOURCE_DIR}
     ${CMAKE_BINARY_DIR}/_deps/matplotplusplus-build/source/matplot/
 )
 

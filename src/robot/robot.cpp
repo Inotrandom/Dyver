@@ -8,12 +8,14 @@
  *
  */
 
+#include <cerrno>
 #include <cstring>
 
 #include "cache/cache_manager.h"
 #include "cli/cli.h"
 #include "networking/dyver/client.h"
 #include "robot/driver/abstract_driver.h"
+#include "pigpio.h"
 #include "utils.h"
 
 #define ROBOT_TARGET_LINUX
@@ -24,6 +26,7 @@ struct robot_options_t
 {
 	bool daemon = false;
 	bool tests = false;
+	bool thruster_tests = false;
 };
 
 void hardware_tests()
@@ -43,6 +46,61 @@ void hardware_tests()
 	}
 }
 
+void user_acknowledge()
+{
+	std::cout << "Press enter to continue..." << std::endl;
+	std::string buf;
+	// ew
+	std::getline(std::cin, buf);
+	return;
+}
+
+void thruster_tests()
+{
+	std::stringstream s;
+	int p = -1;
+
+	if (gpioInitialise() == -1)
+	{
+		utils::log("(pigpio) Unable to initialize.", utils::MSG_TYPE::ERROR);
+		return;
+	}
+
+	do
+	{
+		std::cout << "[info] Provide a GPIO pin number.\n->";
+		std::string buf;
+		std::getline(std::cin, buf);
+
+		s << buf;
+		s >> p;
+
+		if (p <= 0)
+		{
+			std::cout << "[info] Malformed input, pin not set. Please try again." << std::endl;
+		}
+	} while (p == -1);
+
+	utils::log("This test will initialize the ESC, run the thruster, and then stop the ESC. DO NOT ATTEMPT to terminate the program during this sequence, or "
+			   "the ESC may get confused.");
+	user_acknowledge();
+
+	utils::log("Check for initialization.");
+	gpioServo(p, 1500);
+	user_acknowledge();
+
+	utils::log("Check for running.");
+	gpioServo(p, 1550);
+	user_acknowledge();
+
+	utils::log("Check for stopping.");
+	time_sleep(1);
+	gpioServo(p, 0);
+
+	user_acknowledge();
+	utils::log("The thruster test has concluded without software malfunction.");
+}
+
 auto main(int argc, char **argv) -> int
 {
 	(void)argv;
@@ -60,6 +118,11 @@ auto main(int argc, char **argv) -> int
 		{
 			opt.tests = true;
 		}
+
+		if (strcmp(argv[1], "--test-bescr3") == 0)
+		{
+			opt.thruster_tests = true;
+		}
 	}
 
 	client_t client = client_t();
@@ -69,9 +132,16 @@ auto main(int argc, char **argv) -> int
 	robot_cache.write_buf("is_daemon", utils::to_yn(opt.daemon));
 	robot_cache.rebuild_cache();
 
+	if (opt.thruster_tests == true)
+	{
+		thruster_tests();
+		return 0;
+	}
+
 	if (opt.tests == true)
 	{
 		hardware_tests();
+		return 0;
 	}
 
 	if (opt.daemon == false)
