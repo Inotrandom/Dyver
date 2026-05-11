@@ -101,6 +101,7 @@ void thruster_tests()
 
 	user_acknowledge();
 	utils::log("The thruster test has concluded without software malfunction.");
+	gpioTerminate();
 }
 
 auto main(int argc, char **argv) -> int
