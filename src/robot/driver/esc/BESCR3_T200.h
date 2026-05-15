@@ -19,6 +19,14 @@
 #define REC_DELIM "\n"
 #define REC_COMMENT ";"
 
+#define T200_DAT_PWM_us 0
+#define T200_DAT_RPM 1
+#define T200_DAT_CURRENT_A 2
+#define T200_DAT_VOLTAGE_V 3
+#define T200_DAT_POWER_W 4
+#define T200_DAT_FORCE_kgf 5
+#define T200_DAT_EFFICIENCY_gw 6
+
 typedef std::vector<std::vector<double>> records_t;
 
 enum VOLTAGE_MODE
@@ -142,9 +150,23 @@ public:
 		return 0.0;
 	}
 
-	auto get_current_A_from_pwm_us_approx(int pwm_signal_us) -> double { return get_var_to_var(pwm_signal_us, 0, 2); }
-	auto get_force_kgf_from_pwm_us_approx(int pwm_signal_us) -> double { return get_var_to_var(pwm_signal_us, 0, 5); }
-	auto get_pwm_us_from_force_kgf_approx(double force_kgf) -> double { return get_var_to_var(force_kgf, 5, 0); }
+	auto get_current_A_from_pwm_us_approx(int pwm_signal_us) -> double { return get_var_to_var(pwm_signal_us, T200_DAT_PWM_us, T200_DAT_CURRENT_A); }
+	auto get_force_kgf_from_pwm_us_approx(int pwm_signal_us) -> double { return get_var_to_var(pwm_signal_us, T200_DAT_PWM_us, T200_DAT_FORCE_kgf); }
+	auto get_pwm_us_from_force_kgf_approx(double force_kgf) -> double { return get_var_to_var(force_kgf, T200_DAT_FORCE_kgf, T200_DAT_PWM_us); }
+
+	auto get_force_max_kgf() -> double
+	{
+		std::vector<double> vec = collect_all_of_t200_data(T200_DAT_FORCE_kgf, m_records);
+		utils::sort_greatest_to_least(vec);
+		return vec.front();
+	}
+
+	auto get_force_min_kgf() -> double
+	{
+		std::vector<double> vec = collect_all_of_t200_data(T200_DAT_FORCE_kgf, m_records);
+		utils::sort_least_to_greatest(vec);
+		return vec.front();
+	}
 
 private:
 	std::shared_ptr<records_t> m_records = nullptr;

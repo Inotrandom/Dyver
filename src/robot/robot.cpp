@@ -147,6 +147,11 @@ auto main(int argc, char **argv) -> int
 		return 0;
 	}
 
+	if (gpioInitialise() == -1)
+	{
+		return -1;
+	}
+
 	if (opt.daemon == false)
 	{
 		cli_t cli = cli_t("Dyver Client CLI");

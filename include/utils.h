@@ -35,6 +35,12 @@ constexpr double NANOU_T_U = (1.0e-9);
 constexpr double KILOU_T_U = (1.0e3);
 
 /**
+ * @brief Convert a kilogram of force to a Newton of force
+ *
+ */
+constexpr double kgf_T_N = 9.80665;
+
+/**
  * @brief Returns the square of n
  *
  * @param n The number to take the square of
@@ -182,6 +188,8 @@ template <typename N> inline auto closest_value_to(N number, std::vector<N> numb
 	return numbers.back();
 }
 
+template <typename N> inline auto sort_greatest_to_least(std::vector<N> &numbers) { std::sort(numbers.begin(), numbers.end(), std::greater<N>()); }
+template <typename N> inline auto sort_least_to_greatest(std::vector<N> &numbers) { std::sort(numbers.begin(), numbers.end(), std::less<N>()); }
 } // namespace utils
 
 #endif

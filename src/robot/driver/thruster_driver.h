@@ -9,6 +9,9 @@ public:
 
 	virtual auto set_throttle(double t) -> int = 0;
 
+	virtual auto init() -> int = 0;
+	virtual void stop() = 0;
+
 private:
 };
 
