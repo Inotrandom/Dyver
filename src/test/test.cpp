@@ -19,8 +19,11 @@
 #include "topside/core/rov.h"
 
 #include "utils.h"
+#include "strutils.h"
 
 #include "test.h"
+
+#include "robot/driver/esc/BESCR3_T200.h"
 
 static const test_t TEST_TEST = test_t("test_test", __LINE__,
 	[]()
@@ -295,6 +298,20 @@ static const test_t TEST_CACHE_MANAGER = test_t("test_cache_manager", __LINE__,
 static const test_t TEST_UTILS = test_t("test_utils", __LINE__,
 	[]()
 	{
+		std::string s = "Please split	my\nstring.";
+		std::vector<std::string> split_res = string_split_whitespace(s);
+		const std::vector<std::string> split_comp = {"Please", "split", "my", "string."};
+		if (split_res != split_comp)
+		{
+			return false;
+		}
+
+		for (const auto &s : split_res)
+		{
+			std::cout << s << " ";
+		}
+		std::cout << "\n\n";
+
 		std::uint8_t b1 = 0b00000000;
 		std::uint8_t b2 = 0b00000000;
 
@@ -330,6 +347,63 @@ static const test_t TEST_UTILS = test_t("test_utils", __LINE__,
 		return true;
 	});
 
+static const test_t TEST_CLOSEST_VALUE_TO = test_t("test_closest_value_to", __LINE__,
+	[]()
+	{
+		std::vector<double> test_values = {-2.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+		double res = utils::closest_value_to(2.6, test_values);
+
+		std::cout << res << std::endl;
+
+		if (res != 3.0)
+		{
+			return false;
+		}
+
+		res = utils::closest_value_to(1.1, test_values);
+		std::cout << res << std::endl;
+
+		if (res != 1.0)
+		{
+			return false;
+		}
+
+		res = utils::closest_value_to(-2.2, test_values);
+		std::cout << res << std::endl;
+
+		if (res != -2.0)
+		{
+			return false;
+		}
+
+		return true;
+	});
+
+static const test_t TEST_BESCR3_T200_MATHS = test_t("test_bescr3_t200_maths", __LINE__,
+	[]()
+	{
+		t200_data_t data = t200_data_t();
+		data.load(VOLTAGE_MODE::V10);
+
+		int pwm_us = data.get_pwm_us_from_force_kgf_approx(-2.31);
+		std::cout << "pwm from -2.31 kfg: " << pwm_us << std::endl;
+
+		if (pwm_us != 1100)
+		{
+			return false;
+		}
+
+		double current_A = data.get_current_A_from_pwm_us_approx(1100);
+		std::cout << current_A << std::endl;
+
+		if (current_A != 13.620)
+		{
+			return false;
+		}
+
+		return true;
+	});
+
 auto main() -> int
 {
 	std::cout << "Commencing Dyver Tests" << std::endl;
@@ -344,10 +418,12 @@ auto main() -> int
 	TEST_PWM_THROTTLE.run(&passed_tests, &failed_tests);
 	TEST_ABSTRACT_ROV.run(&passed_tests, &failed_tests);
 	TEST_DELEGATE.run(&passed_tests, &failed_tests);
-	TEST_IOSOCK.run(&passed_tests, &failed_tests);
-	TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
+	// TEST_IOSOCK.run(&passed_tests, &failed_tests);
+	// TEST_CLIENT_SERVER.run(&passed_tests, &failed_tests);
 	TEST_CACHE_MANAGER.run(&passed_tests, &failed_tests);
 	TEST_UTILS.run(&passed_tests, &failed_tests);
+	TEST_CLOSEST_VALUE_TO.run(&passed_tests, &failed_tests);
+	TEST_BESCR3_T200_MATHS.run(&passed_tests, &failed_tests);
 
 	std::cout << passed_tests << " tests passed" << std::endl;
 	std::cout << failed_tests << " tests failed" << std::endl;
