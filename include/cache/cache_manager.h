@@ -24,8 +24,28 @@ const std::vector<std::filesystem::path> CACHE_PATHS =
 const std::string LEX_DELIM = "\n";
 const std::string LEX_KP = "=";
 const std::string LEX_COMMENT = "#";
+const std::string LEX_NEST_DELIM = ".";
 
 const int KP_SIZE = 2;
+
+inline auto nest_keys(const std::vector<std::string> &args) -> std::string
+{
+	std::stringstream res;
+	std::string sres = "";
+	if (args.empty() == true)
+	{
+		return "";
+	}
+
+	for (const auto &s : args)
+	{
+		res << s << ".";
+	}
+	sres = res.str();
+	sres.pop_back();
+
+	return sres;
+}
 
 class cache_manager_t
 {

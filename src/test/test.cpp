@@ -270,6 +270,12 @@ static const test_t TEST_CLIENT_SERVER = test_t("test_client_server", __LINE__,
 static const test_t TEST_CACHE_MANAGER = test_t("test_cache_manager", __LINE__,
 	[]()
 	{
+		std::string nest_res = nest_keys({"thruster", "test"});
+		if (nest_res != "thruster.test")
+		{
+			return false;
+		}
+
 		cache_manager_t manager = cache_manager_t("test");
 		manager.write_buf("test_k", "test_p");
 		manager.write_buf("test_k2", "Multiline cache");
