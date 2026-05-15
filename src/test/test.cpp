@@ -278,7 +278,7 @@ static const test_t TEST_CACHE_MANAGER = test_t("test_cache_manager", __LINE__,
 
 		cache_manager_t manager = cache_manager_t("test");
 		manager.write_buf("test_k", "test_p");
-		manager.write_buf("test_k2", "Multiline cache");
+		manager.write_buf("test_k2", "Multiword cache");
 
 		for (auto &[k, p] : *manager.get_cache())
 		{
@@ -290,10 +290,35 @@ static const test_t TEST_CACHE_MANAGER = test_t("test_cache_manager", __LINE__,
 
 		if (manager.read_buf("test_k") != "test_p")
 		{
+			utils::log("\"test_k\" does not equal \"test_p\". It instead equals: " + manager.read_buf("test_k"), utils::MSG_TYPE::ERROR);
 			return false;
 		}
 
-		if (manager.read_buf("test_k2") != "Multiline cache")
+		if (manager.read_buf("test_k2") != "Multiword cache")
+		{
+			utils::log("\"test_k2\" does not equal \"Multiword cache\". It instead equals: " + manager.read_buf("test_k2"), utils::MSG_TYPE::ERROR);
+			return false;
+		}
+
+		manager.write_buf("test.nested1", "quite nested");
+		manager.write_buf("test.nested2", "birds");
+
+		manager.rebuild_cache();
+		manager.load_cache();
+
+		// Note: Scope is different from the beginning of the string, so the first two entries are omitted
+		std::vector<std::string> all_test = manager.read_all_with_scope("test");
+
+		for (const auto &element : all_test)
+		{
+			std::cout << element << std::endl;
+		}
+		if (all_test[0] != "quite nested")
+		{
+			return false;
+		}
+
+		if (all_test[1] != "birds")
 		{
 			return false;
 		}

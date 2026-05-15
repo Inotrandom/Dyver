@@ -128,12 +128,17 @@ public:
 		buf << m_file->rdbuf();
 		parse_cache(buf.str());
 		m_file->close();
+		m_is_open = true;
 	}
 
 	void write_buf(std::string k, std::string p) { (*m_cache_buffer)[k] = p; }
 
 	auto read_buf_or(std::string k, std::string def) -> std::string
 	{
+		if (is_open() == false)
+		{
+			return def;
+		}
 		if (m_cache_buffer->contains(k))
 		{
 			return read_buf(k);
@@ -144,7 +149,44 @@ public:
 		return def;
 	}
 
-	auto read_buf(std::string k) -> std::string { return (*m_cache_buffer)[k]; }
+	auto read_buf(std::string k) -> std::string
+	{
+		if (is_open() == false)
+		{
+			return std::string();
+		}
+		return (*m_cache_buffer)[k];
+	}
+
+	auto read_all_with_scope(std::string k_scope_name) -> std::vector<std::string>
+	{
+		if (k_scope_name.ends_with(LEX_NEST_DELIM) == false)
+		{
+			k_scope_name += LEX_NEST_DELIM;
+		}
+
+		if (is_open() == false)
+		{
+			return {};
+		}
+		std::vector<std::string> res = {};
+
+		if (m_cache_buffer->empty() == true)
+		{
+			return {};
+		}
+
+		for (auto &[k, p] : *m_cache_buffer)
+		{
+			if (k.starts_with(k_scope_name) == false)
+			{
+				continue;
+			}
+			res.push_back(p);
+		}
+
+		return res;
+	}
 
 	void rebuild_cache()
 	{
@@ -160,6 +202,8 @@ public:
 		}
 		m_file->close();
 	}
+
+	auto is_open() -> bool { return (m_is_open); }
 
 private:
 	void parse_cache(std::string buf)
@@ -200,10 +244,11 @@ private:
 		}
 	}
 
-	std::shared_ptr<std::fstream> m_file;
+	std::shared_ptr<std::fstream> m_file = nullptr;
 
-	std::string m_name;
-	std::shared_ptr<std::map<std::string, std::string>> m_cache_buffer;
+	std::string m_name = "";
+	std::shared_ptr<std::map<std::string, std::string>> m_cache_buffer = nullptr;
+	bool m_is_open = false;
 };
 
 #endif // CACHE_MANAGER_H
