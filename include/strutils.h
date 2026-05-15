@@ -17,9 +17,9 @@
  */
 inline auto string_split(std::string s, const std::string &delimiter) -> std::vector<std::string>
 {
-	std::vector<std::string> tokens;
+	std::vector<std::string> tokens = {};
 	std::size_t pos = 0;
-	std::string token;
+	std::string token = "";
 
 	while ((pos = s.find(delimiter)) != std::string::npos)
 	{
@@ -32,6 +32,20 @@ inline auto string_split(std::string s, const std::string &delimiter) -> std::ve
 	if (tokens.empty())
 	{
 		tokens.push_back(s);
+	}
+
+	return tokens;
+}
+
+inline auto string_split_whitespace(std::string s) -> std::vector<std::string>
+{
+	std::vector<std::string> tokens = {};
+	std::stringstream buf = std::stringstream();
+	buf << s;
+	std::string token = "";
+	while (buf >> token)
+	{
+		tokens.push_back(token);
 	}
 
 	return tokens;
@@ -112,6 +126,16 @@ inline auto to_lower(std::string &s) -> std::string
 {
 	std::string res = s;
 	std::transform(s.cbegin(), s.cend(), res.begin(), [](const char c) { return std::tolower(c); });
+	return res;
+}
+
+inline auto string_safe_dcast(const std::string &s) -> double
+{
+	double res = 0.0;
+	std::stringstream stream;
+	stream << s;
+	stream >> res;
+
 	return res;
 }
 
