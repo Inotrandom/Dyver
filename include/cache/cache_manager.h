@@ -158,7 +158,7 @@ public:
 		return (*m_cache_buffer)[k];
 	}
 
-	auto read_all_with_scope(std::string k_scope_name) -> std::vector<std::string>
+	auto get_all_keys_with_scope(std::string k_scope_name) -> std::vector<std::string>
 	{
 		if (k_scope_name.ends_with(LEX_NEST_DELIM) == false)
 		{
@@ -182,7 +182,18 @@ public:
 			{
 				continue;
 			}
-			res.push_back(p);
+			res.push_back(k);
+		}
+
+		return res;
+	}
+
+	auto read_all_with_scope(std::string k_scope_name) -> std::vector<std::string>
+	{
+		std::vector<std::string> res = {};
+		for (const auto &k : get_all_keys_with_scope(k_scope_name))
+		{
+			res.push_back(read_buf_or(k, "<undefined>"));
 		}
 
 		return res;
