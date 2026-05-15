@@ -1,10 +1,12 @@
 #ifndef H_UTILS
 #define H_UTILS
 
+#include <algorithm>
 #include <cstdint>
 #include <cmath>
 #include <string>
 #include <bitset>
+#include <vector>
 
 namespace utils
 {
@@ -159,6 +161,25 @@ inline auto tc_tw(std::uint8_t b1, std::uint8_t b2) -> std::int16_t
 	resbs.flip();
 
 	return -((std::int16_t)resbs.to_ulong() + 1);
+}
+
+template <typename N> inline auto closest_value_to(N number, std::vector<N> numbers) -> N
+{
+	if (numbers.empty() == true)
+	{
+		return 0;
+	}
+
+	std::sort(numbers.begin(), numbers.end(),
+		[=](N a, N b)
+		{
+			N adiff = std::abs((number - a));
+			N bdiff = std::abs((number - b));
+
+			return (adiff >= bdiff);
+		});
+
+	return numbers.back();
 }
 
 } // namespace utils
