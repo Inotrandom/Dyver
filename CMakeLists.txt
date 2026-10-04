@@ -9,3 +9,9 @@ add_executable(
 add_subdirectory(
 	${CMAKE_SOURCE_DIR}/robot
 )
+
+target_include_directories(
+	${PROJECT_NAME}
+	PRIVATE
+	${CMAKE_SOURCE_DIR}/include
+)
