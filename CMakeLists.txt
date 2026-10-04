@@ -5,3 +5,7 @@ add_executable(
 	${PROJECT_NAME}
 	${CMAKE_SOURCE_DIR}/src/main.c
 )
+
+add_subdirectory(
+	${CMAKE_SOURCE_DIR}/robot
+)
