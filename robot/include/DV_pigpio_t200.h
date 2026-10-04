@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "DV_defs.h"
-
 typedef struct
 {
 	char *id;
