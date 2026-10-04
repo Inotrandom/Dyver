@@ -1,4 +1,0 @@
-#ifndef H_BINDABLE_ACTION
-#define H_BINDABLE_ACTION
-
-#endif
